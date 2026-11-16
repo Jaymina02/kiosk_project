@@ -1,5 +1,5 @@
 package kr.co.sist.user.service;
 
-public class ExService {
+public class OrderService {
 
 }
