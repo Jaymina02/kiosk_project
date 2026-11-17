@@ -36,56 +36,47 @@ import kr.co.sist.user.dto.MenuDTO;
 import kr.co.sist.user.evt.MenuEvt;
 
 /**
- * 카페 키오스크 사용자 메뉴 화면
+ * 사용자 메뉴 선택 화면
  *
- * 담당 기능
+ * 주요 기능
  * 1. 카테고리 표시
- * 2. 메뉴 목록 표시
- * 3. 메뉴 상세화면 이동
- * 4. 품절 메뉴 표시 및 선택 제한
- * 5. 장바구니 개수와 총금액 표시
- * 6. 결제 화면 연결
- *
- * 기존 화면 디자인
- * - 크기 804 x 564
- * - 회색 배경
- * - 메뉴 카드 4열
- * - 하단 장바구니 및 결제 버튼
+ * 2. 메뉴 조회
+ * 3. 품절 상품 표시
+ * 4. 상품 상세 화면 열기
+ * 5. 장바구니 개수 및 금액 표시
+ * 6. 장바구니가 비어 있으면 결제 차단
+ * 7. 결제 선택 화면 연결
  */
 public class MenuForm extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
     // ========================================
-    // 1. 화면 기본 설정
+    // 1. 기본 색상 및 숫자 형식
     // ========================================
 
-    // 메인 배경색
     private static final Color BG =
             new Color(170, 170, 170);
 
-    // 선택된 카테고리 버튼 색상
     private static final Color SELECTED =
             new Color(100, 100, 100);
 
-    // 품절 표시 배경색
     private static final Color SOLD_OUT_BG =
             new Color(70, 70, 70);
 
-    // 원화 표시
     private static final NumberFormat MONEY =
             NumberFormat.getIntegerInstance(
                     Locale.KOREA
             );
 
     // ========================================
-    // 2. 팀원 기능 연결
+    // 2. 팀원 기능 연결용 변수
     // ========================================
 
-    // 3번 담당자 결제 화면 연결
+    // 3번 담당자의 결제 화면 실행 기능
     private static Runnable paymentHandler;
 
-    // 2번 담당자 장바구니 개수
+    // 2번 담당자 장바구니 상품 개수
     private static IntSupplier cartCountSupplier =
             () -> 0;
 
@@ -94,39 +85,31 @@ public class MenuForm extends JFrame {
             () -> 0;
 
     // ========================================
-    // 3. 화면 컴포넌트
+    // 3. 화면 구성 요소
     // ========================================
 
-    // 카테고리 버튼 영역
     private final JPanel categoryPanel =
             new JPanel(null);
 
-    // 메뉴 카드 영역
     private final JPanel cardPanel =
             new JPanel(null);
 
-    // 하단 장바구니 정보
     private final JLabel cartSummary =
             new JLabel(
                     "담은 상품 0개  |  합계 0원"
             );
 
-    // 결제 버튼
     private final JButton checkoutButton =
             new JButton("결제");
 
-    // 메뉴 이벤트
     private final MenuEvt menuEvt;
 
-    // 카테고리 목록
     private List<CategoryDTO> categories =
             new ArrayList<>();
 
-    // 메뉴 목록
     private List<MenuDTO> menus =
             new ArrayList<>();
 
-    // 현재 선택한 카테고리
     private long selectedCategoryId = 0;
 
     // ========================================
@@ -137,24 +120,16 @@ public class MenuForm extends JFrame {
 
         super("카페 키오스크 - 메뉴 선택");
 
-        // 화면 크기 설정
+        // 화면 설정
         setSize(804, 564);
-
-        // 화면 중앙 배치
         setLocationRelativeTo(null);
-
-        // 화면 크기 변경 방지
         setResizable(false);
 
-        // 화면 닫기
         setDefaultCloseOperation(
                 JFrame.DISPOSE_ON_CLOSE
         );
 
-        // 자유 배치
         getContentPane().setLayout(null);
-
-        // 배경색 설정
         getContentPane().setBackground(BG);
 
         // ====================================
@@ -213,7 +188,7 @@ public class MenuForm extends JFrame {
 
         add(bottom);
 
-        // 장바구니 요약
+        // 장바구니 개수 및 금액 표시
         cartSummary.setBounds(
                 40, 10, 545, 36
         );
@@ -237,10 +212,7 @@ public class MenuForm extends JFrame {
                 new Color(75, 75, 75)
         );
 
-        checkoutButton.setForeground(
-                Color.WHITE
-        );
-
+        checkoutButton.setForeground(Color.WHITE);
         checkoutButton.setFocusPainted(false);
 
         checkoutButton.setFont(
@@ -254,36 +226,35 @@ public class MenuForm extends JFrame {
         bottom.add(checkoutButton);
 
         // ====================================
-        // 8. 이벤트 객체 생성
+        // 8. 이벤트 연결
         // ====================================
 
         menuEvt = new MenuEvt(this);
 
-        // 결제 버튼 이벤트
         checkoutButton.addActionListener(
                 e -> menuEvt.clickCheckout()
         );
 
         // ====================================
-        // 9. DB 데이터 조회
+        // 9. DB 메뉴 데이터 불러오기
         // ====================================
 
-        // 카테고리 조회
         menuEvt.loadCategories();
 
-        // 전체 메뉴 조회
         menuEvt.selectCategory(0);
 
-        // 장바구니 금액 표시
         refreshCartSummary();
     }
 
     // ========================================
-    // 10. 결제 화면 연결
+    // 10. 결제 기능 연결
     // ========================================
 
     /**
-     * 3번 담당자의 결제 선택 화면 연결
+     * 3번 담당자의 결제 선택 화면을
+     * 실행할 핸들러를 등록한다.
+     *
+     * KioskMain.java에서 호출한다.
      */
     public static void setPaymentHandler(
             Runnable handler) {
@@ -292,29 +263,82 @@ public class MenuForm extends JFrame {
     }
 
     /**
-     * 결제 선택 화면 실행
+     * 결제 버튼 클릭 시 실행
+     *
+     * 1. 장바구니 상품 개수 확인
+     * 2. 상품이 없으면 결제 차단
+     * 3. 상품이 있으면 결제 화면 실행
      */
     public void openPaymentSelectForm() {
 
-        if (paymentHandler != null) {
+        // 현재 장바구니 상품 개수
+        int cartCount;
 
-            paymentHandler.run();
+        try {
 
-        } else {
+            cartCount =
+                    cartCountSupplier.getAsInt();
+
+        } catch (RuntimeException e) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "결제 화면 연결 전입니다."
+                    "장바구니 정보를 확인할 수 없습니다.",
+                    "결제 안내",
+                    JOptionPane.WARNING_MESSAGE
             );
+
+            return;
         }
+
+        // ====================================
+        // 장바구니에 상품이 없는 경우
+        // ====================================
+
+        if (cartCount <= 0) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "장바구니에 상품이 없습니다.\n"
+                            + "상품을 먼저 담아주세요.",
+                    "결제 안내",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            // 결제 화면 이동 차단
+            return;
+        }
+
+        // ====================================
+        // 결제 화면 미연결 확인
+        // ====================================
+
+        if (paymentHandler == null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "결제 화면이 연결되지 않았습니다.",
+                    "결제 안내",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        // ====================================
+        // 상품이 있는 경우 결제 화면 이동
+        // ====================================
+
+        paymentHandler.run();
     }
 
     // ========================================
-    // 11. 장바구니 연결
+    // 11. 장바구니 기능 연결
     // ========================================
 
     /**
-     * 장바구니 개수 및 금액 조회 메서드 등록
+     * 2번 담당자의 CartListService와
+     * 연결하기 위한 메서드
      */
     public static void setCartSummarySuppliers(
             IntSupplier itemCount,
@@ -332,7 +356,7 @@ public class MenuForm extends JFrame {
     }
 
     /**
-     * 하단 장바구니 요약 갱신
+     * 하단 장바구니 개수 및 금액 표시
      */
     public void refreshCartSummary() {
 
@@ -365,18 +389,28 @@ public class MenuForm extends JFrame {
     }
 
     // ========================================
-    // 12. 카테고리 목록 표시
+    // 12. 카테고리 관련 메서드
     // ========================================
 
+    public long getSelectedCategoryId() {
+        return selectedCategoryId;
+    }
+
+    public void setSelectedCategoryId(
+            long categoryId) {
+
+        selectedCategoryId = categoryId;
+    }
+
+    public void setCategoryTitle(String title) {
+
+        setTitle(
+                "카페 키오스크 - " + title
+        );
+    }
+
     /**
-     * DB에서 조회한 카테고리로 버튼 생성
-     *
-     * 카테고리
-     * 0 = 전체
-     * 1 = 커피
-     * 2 = 티
-     * 3 = 스무디
-     * 4 = 디저트
+     * 카테고리 버튼 표시
      */
     public void displayCategories(
             List<CategoryDTO> result) {
@@ -386,10 +420,9 @@ public class MenuForm extends JFrame {
                         ? new ArrayList<>()
                         : result;
 
-        // 기존 버튼 삭제
         categoryPanel.removeAll();
 
-        // 전체 버튼을 포함한 목록 생성
+        // 전체 카테고리 추가
         List<CategoryDTO> all =
                 new ArrayList<>();
 
@@ -463,7 +496,6 @@ public class MenuForm extends JFrame {
             categoryPanel.add(button);
         }
 
-        // 화면 다시 그리기
         categoryPanel.revalidate();
         categoryPanel.repaint();
     }
@@ -473,14 +505,13 @@ public class MenuForm extends JFrame {
     // ========================================
 
     /**
-     * DB에서 조회한 메뉴 목록 표시
+     * 메뉴 카드 표시
      *
      * MENU_STATUS
      * 0 = 판매중
      * 1 = 품절
      *
-     * 품절 메뉴는 화면에 표시하지만
-     * 선택할 수 없도록 처리한다.
+     * 품절 상품은 클릭할 수 없다.
      */
     public void displayMenuThumbnails(
             List<MenuDTO> result) {
@@ -490,26 +521,22 @@ public class MenuForm extends JFrame {
                         ? new ArrayList<>()
                         : result;
 
-        // 이전 메뉴 카드 삭제
         cardPanel.removeAll();
 
-        // 메뉴 카드 크기
         final int cardWidth = 155;
         final int cardHeight = 181;
 
-        // 메뉴 카드 간격
         final int gapX = 17;
         final int gapY = 16;
 
-        // 메뉴 목록 반복
         for (int i = 0; i < menus.size(); i++) {
 
             MenuDTO item = menus.get(i);
 
-            // 메뉴 상태값
+            // 메뉴 상태 조회
             int status = item.getMenuStatus();
 
-            // 콘솔에서 DB 상태 확인
+            // 상태 확인용 콘솔 출력
             System.out.println(
                     "[메뉴 조회] "
                             + item.getMenuName()
@@ -517,14 +544,11 @@ public class MenuForm extends JFrame {
                             + status
             );
 
-            // 카드 배치 위치
+            // 메뉴 카드 위치 계산
             int col = i % 4;
             int row = i / 4;
 
-            // =================================
             // 메뉴 카드 생성
-            // =================================
-
             JPanel card = new JPanel(null);
 
             card.setBounds(
@@ -543,7 +567,7 @@ public class MenuForm extends JFrame {
             );
 
             // =================================
-            // 메뉴 이미지 영역
+            // 메뉴 이미지
             // =================================
 
             JLabel picture = new JLabel(
@@ -565,11 +589,10 @@ public class MenuForm extends JFrame {
                     new Color(100, 100, 100)
             );
 
-            // 품절 라벨을 내부에 배치하기 위해
-            // 이미지 영역의 레이아웃을 null로 설정
+            // 품절 라벨 배치를 위해
+            // 이미지 영역에 자유 배치 적용
             picture.setLayout(null);
 
-            // 이미지 읽기
             ImageIcon icon = loadScaledIcon(
                     item.getThumbnailPath(),
                     139,
@@ -583,18 +606,10 @@ public class MenuForm extends JFrame {
             }
 
             // =================================
-            // 품절 표시 기능
+            // 품절 상품 표시
             // =================================
 
             if (status == 1) {
-
-                /*
-                 * 품절 라벨을 이미지 영역 안에
-                 * 직접 추가한다.
-                 *
-                 * 메뉴 카드의 다른 컴포넌트와
-                 * 겹치는 문제를 방지한다.
-                 */
 
                 JLabel soldOutLabel =
                         new JLabel(
@@ -625,10 +640,9 @@ public class MenuForm extends JFrame {
                         )
                 );
 
-                // 이미지 위에 품절 라벨 추가
+                // 이미지 위에 표시
                 picture.add(soldOutLabel);
 
-                // 품절 라벨을 최상단으로 이동
                 picture.setComponentZOrder(
                         soldOutLabel, 0
                 );
@@ -637,7 +651,7 @@ public class MenuForm extends JFrame {
             card.add(picture);
 
             // =================================
-            // 메뉴명 표시
+            // 메뉴 이름
             // =================================
 
             JLabel name = new JLabel(
@@ -659,7 +673,7 @@ public class MenuForm extends JFrame {
             card.add(name);
 
             // =================================
-            // 메뉴 가격 표시
+            // 메뉴 가격
             // =================================
 
             JLabel price = new JLabel(
@@ -683,7 +697,7 @@ public class MenuForm extends JFrame {
             card.add(price);
 
             // =================================
-            // 판매중 메뉴 클릭 이벤트
+            // 판매중 메뉴만 선택 가능
             // =================================
 
             if (status == 0) {
@@ -695,7 +709,6 @@ public class MenuForm extends JFrame {
                     public void mouseClicked(
                             MouseEvent e) {
 
-                        // 메뉴 상세 팝업 실행
                         menuEvt.selectMenu(
                                 item.getMenuId()
                         );
@@ -704,27 +717,17 @@ public class MenuForm extends JFrame {
 
                 card.addMouseListener(click);
 
-                // 이미지, 메뉴명, 가격 클릭도 허용
                 for (Component child :
                         card.getComponents()) {
 
                     child.addMouseListener(click);
                 }
-
-            } else {
-
-                // 품절 메뉴는 클릭 이벤트 미등록
-                // 따라서 상세 팝업이 열리지 않음
             }
 
-            // 메뉴 카드 추가
             cardPanel.add(card);
         }
 
-        // ====================================
-        // 스크롤 영역 크기 설정
-        // ====================================
-
+        // 스크롤 영역 크기 계산
         int rows =
                 (menus.size() + 3) / 4;
 
@@ -738,18 +741,16 @@ public class MenuForm extends JFrame {
                 )
         );
 
-        // 화면 다시 그리기
         cardPanel.revalidate();
         cardPanel.repaint();
     }
 
     // ========================================
-    // 14. 메뉴 상세화면
+    // 14. 메뉴 상세 화면
     // ========================================
 
     /**
-     * 판매중인 메뉴를 선택하면
-     * 상세 팝업을 실행한다.
+     * 메뉴 상세 팝업 표시
      */
     public void openMenuDetail(long menuId) {
 
@@ -759,7 +760,6 @@ public class MenuForm extends JFrame {
                         menuId
                 );
 
-        // 상세 화면 표시
         dialog.setVisible(true);
 
         // 상세화면 종료 후 장바구니 갱신
@@ -771,11 +771,8 @@ public class MenuForm extends JFrame {
     // ========================================
 
     /**
-     * DB IMAGE_PATH / THUMBNAIL_PATH로
-     * 저장된 이미지 파일을 읽는다.
-     *
-     * 예시 경로:
-     * /images/americano.jpg
+     * DB에 저장된 이미지 경로에서
+     * 이미지 파일을 읽어 크기를 조절한다.
      */
     public static ImageIcon loadScaledIcon(
             String path,
@@ -790,7 +787,6 @@ public class MenuForm extends JFrame {
 
         try {
 
-            // 클래스패스 이미지 경로
             String resourcePath =
                     path.startsWith("/")
                             ? path
@@ -803,14 +799,13 @@ public class MenuForm extends JFrame {
 
             ImageIcon original = null;
 
-            // 클래스패스에서 이미지 조회
+            // 클래스패스에서 이미지 로딩
             if (url != null) {
 
                 original = new ImageIcon(url);
             }
 
-            // 이미지가 클래스패스에 없으면
-            // 실제 파일 경로에서 조회
+            // 실제 파일 경로에서 이미지 로딩
             if (original == null
                     || original.getIconWidth() <= 0) {
 
@@ -832,7 +827,6 @@ public class MenuForm extends JFrame {
                 }
             }
 
-            // 이미지가 없으면 null 반환
             if (original == null
                     || original.getIconWidth() <= 0) {
 
@@ -857,34 +851,8 @@ public class MenuForm extends JFrame {
     }
 
     // ========================================
-    // 16. Getter / Setter
+    // 16. Getter
     // ========================================
-
-    /**
-     * 현재 선택된 카테고리 번호
-     */
-    public long getSelectedCategoryId() {
-        return selectedCategoryId;
-    }
-
-    /**
-     * 카테고리 번호 변경
-     */
-    public void setSelectedCategoryId(
-            long categoryId) {
-
-        selectedCategoryId = categoryId;
-    }
-
-    /**
-     * 메뉴 화면 제목 변경
-     */
-    public void setCategoryTitle(String title) {
-
-        setTitle(
-                "카페 키오스크 - " + title
-        );
-    }
 
     /**
      * 결제 버튼 반환
