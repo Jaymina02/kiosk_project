@@ -1,247 +1,155 @@
+
 package kr.co.sist.user.evt;
 
-import kr.co.sist.user.dto.CategoryDTO;
+import javax.swing.JOptionPane;
+
 import kr.co.sist.user.dto.MenuDTO;
 import kr.co.sist.user.service.MenuService;
 import kr.co.sist.user.view.MenuForm;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-
 /**
- * 메뉴 목록 화면에서 발생하는 버튼 이벤트 처리.
+ * 메뉴 화면 이벤트 클래스
  *
- * 1. 카테고리 목록 조회
+ * 1. 카테고리 조회
  * 2. 카테고리 선택
- * 3. 메뉴 선택
- * 4. 품절 상태 확인
- * 5. 장바구니 수량 및 금액 갱신
- * 6. 결제 버튼 클릭 처리
+ * 3. 메뉴 상세 선택
+ * 4. 결제 버튼 처리
  */
-public class MenuEvt implements ActionListener {
+public class MenuEvt {
 
-    // 현재 메뉴 화면
-    private final MenuForm menuForm;
+    private final MenuForm form;
 
-    // 메뉴 DB 조회 서비스를 담당하는 객체
-    private final MenuService menuService;
+    private final MenuService service =
+            new MenuService();
 
-    // 현재 선택한 카테고리 번호
-    private long selectedCategoryId = 0;
-
-    /**
-     * 클래스 다이어그램의 MenuEvt(MenuForm) 생성자.
-     */
-    public MenuEvt(MenuForm menuForm) {
-
-        // 메뉴 화면 참조 저장
-        this.menuForm = menuForm;
-
-        // 메뉴 조회 서비스 생성
-        this.menuService = new MenuService();
+    public MenuEvt(MenuForm form) {
+        this.form = form;
     }
 
     /**
-     * 메뉴 화면이 처음 생성될 때 실행.
-     *
-     * DB에서 카테고리와 전체 메뉴를 조회한다.
+     * 카테고리 전체 조회
      */
     public void loadCategories() {
 
         try {
 
-            // Oracle CATEGORY 테이블에서 목록 조회
-            List<CategoryDTO> categories =
-                    menuService.searchCategories();
+            form.displayCategories(
+                service.searchCategories()
+            );
 
-            // 조회한 카테고리 목록 저장
-            menuForm.setCategoryList(categories);
+        } catch (IllegalStateException ex) {
 
-            // 카테고리 버튼 출력
-            menuForm.displayCategories();
+            ex.printStackTrace();
 
-            // 처음에는 전체 메뉴 표시
-            selectCategory(0);
-
-            // 장바구니 요약 표시
-            refreshCartSummary();
-
-        } catch (RuntimeException e) {
-
-            // DB 연결 실패 등의 오류 표시
-            showError("카테고리 조회 실패", e);
+            JOptionPane.showMessageDialog(
+                form,
+                "카테고리 조회 실패: "
+                    + rootMessage(ex),
+                "DB 오류",
+                JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
     /**
-     * MenuForm의 버튼 클릭 시 자동 실행.
+     * 카테고리 선택
      */
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-        // 클릭한 객체 확인
-        Object source = e.getSource();
-
-        // 결제 버튼 클릭
-        if (source == menuForm.getCheckoutButton()) {
-
-            clickCheckout();
-            return;
-        }
-
-        // 클릭한 객체가 JButton인지 확인
-        if (source instanceof JButton button) {
-
-            // 카테고리 버튼에 저장한 값 확인
-            Object categoryId =
-                    button.getClientProperty("categoryId");
-
-            // 상품 카드에 저장한 메뉴번호 확인
-            Object menuId =
-                    button.getClientProperty("menuId");
-
-            // 카테고리 버튼을 누른 경우
-            if (categoryId instanceof Number number) {
-
-                selectCategory(number.longValue());
-
-            // 상품 카드를 누른 경우
-            } else if (menuId instanceof Number number) {
-
-                selectMenu(number.longValue());
-            }
-        }
-    }
-
-    /**
-     * 선택한 카테고리의 메뉴를 DB에서 조회한다.
-     *
-     * 0을 전달하면 전체 메뉴를 조회한다.
-     */
-    public void selectCategory(long categoryId) {
+    public void selectCategory(
+            long categoryId) {
 
         try {
 
-            // 조회할 카테고리 번호 저장
-            selectedCategoryId = categoryId;
+            form.setSelectedCategoryId(
+                categoryId
+            );
 
-            // Oracle MENU 테이블에서 메뉴 조회
-            List<MenuDTO> menus =
-                    menuService.searchMenus(categoryId);
+            form.displayCategories(
+                service.searchCategories()
+            );
 
-            // 조회한 메뉴 목록을 화면에 전달
-            menuForm.setMenuList(menus);
+            form.displayMenuThumbnails(
+                service.searchMenus(categoryId)
+            );
 
-            // 상품 이미지, 이름, 가격 표시
-            menuForm.displayMenus();
+        } catch (IllegalStateException ex) {
 
-            // 현재 카테고리 제목 변경
-            if (categoryId == 0) {
+            ex.printStackTrace();
 
-                menuForm.setCategoryTitle("전체 메뉴");
-
-            } else {
-
-                menuForm.setCategoryTitle("카테고리별 메뉴");
-            }
-
-        } catch (RuntimeException e) {
-
-            // 메뉴 조회 오류 메시지 표시
-            showError("메뉴 조회 실패", e);
+            JOptionPane.showMessageDialog(
+                form,
+                "메뉴 조회 실패: "
+                    + rootMessage(ex),
+                "DB 오류",
+                JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
     /**
-     * 고객이 상품 카드를 클릭했을 때 실행.
+     * 메뉴 클릭
      */
     public void selectMenu(long menuId) {
 
         try {
 
-            // DB에서 메뉴의 최신 정보 조회
-            MenuDTO menu =
-                    menuService.searchMenuDetail(menuId);
+            MenuDTO selected =
+                service.searchMenuDetail(menuId);
 
-            // 상품이 삭제되었거나 존재하지 않는 경우
-            if (menu == null) {
+            if (selected == null) {
 
                 JOptionPane.showMessageDialog(
-                        menuForm,
-                        "삭제되었거나 존재하지 않는 메뉴입니다."
+                    form,
+                    "선택한 메뉴를 찾을 수 없습니다."
                 );
 
-                return;
-            }
-
-            // 판매중인 상태가 아닌 경우
-            if (!menu.isOrderable()) {
+            } else if (
+                    selected.getMenuStatus() != 0) {
 
                 JOptionPane.showMessageDialog(
-                        menuForm,
-                        "현재 품절된 메뉴입니다."
+                    form,
+                    "현재 품절된 메뉴입니다."
                 );
 
-                return;
+            } else {
+
+                form.openMenuDetail(menuId);
             }
 
-            // 판매중이면 상품 상세 팝업 표시
-            menuForm.openMenuDetail(menuId);
+        } catch (IllegalStateException ex) {
 
-        } catch (RuntimeException e) {
+            ex.printStackTrace();
 
-            // 메뉴 선택 오류 표시
-            showError("메뉴 선택 실패", e);
+            JOptionPane.showMessageDialog(
+                form,
+                "메뉴 상세 조회 실패: "
+                    + rootMessage(ex),
+                "DB 오류",
+                JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
     /**
-     * 장바구니 상품 개수 및 총금액 표시.
-     *
-     * 2번 담당자의 CartListService와 연결되면
-     * 실제 데이터를 가져오게 된다.
-     */
-    public void refreshCartSummary() {
-
-        // MenuForm에 등록된 장바구니 조회 함수 실행
-        menuForm.refreshCartSummary();
-    }
-
-    /**
-     * 고객이 결제 버튼을 눌렀을 때 실행.
+     * 결제 버튼 클릭
      */
     public void clickCheckout() {
 
-        // 3번 담당자의 결제 화면으로 연결
-        menuForm.openPaymentSelectForm();
-    }
-
-    // 현재 선택한 카테고리 번호 반환
-    public long getSelectedCategoryId() {
-        return selectedCategoryId;
+        form.openPaymentSelectForm();
     }
 
     /**
-     * 오류 발생 시 Eclipse 콘솔과 사용자 화면에 표시.
+     * 가장 안쪽 오류 메시지 가져오기
      */
-    private void showError(
-            String message,
-            RuntimeException e) {
+    private static String rootMessage(
+            Throwable ex) {
 
-        // Eclipse Console에 상세 오류 출력
-        e.printStackTrace();
+        while (ex.getCause() != null) {
 
-        // 사용자에게 오류 안내창 표시
-        JOptionPane.showMessageDialog(
-                menuForm,
-                message + "\n" + e.getMessage(),
-                "오류",
-                JOptionPane.ERROR_MESSAGE
-        );
+            ex = ex.getCause();
+        }
+
+        return ex.getMessage() == null
+            ? ex.toString()
+            : ex.getMessage();
     }
 }
