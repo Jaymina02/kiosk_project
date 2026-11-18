@@ -167,8 +167,7 @@ public class AdminMenuForm extends JFrame {
 		JScrollPane scroll = new JScrollPane(menuTable);
 		scroll.setBorder(null);
 		scroll.getViewport().setBackground(BG);
-		
-		
+
 		// 안내 문구, 요약, 뒤로 가기
 		JLabel note = new JLabel("※ 메뉴명을 클릭하면 상품 상세 조회");
 		summaryLabel = new JLabel(" ");
