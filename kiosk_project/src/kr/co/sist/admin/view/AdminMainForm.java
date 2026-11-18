@@ -1,7 +1,7 @@
 package kr.co.sist.admin.view;
 import java.awt.*;
 import javax.swing.*;
-
+/** 화면설계서의 세 개 관리 버튼 배치. */
 public class AdminMainForm extends JFrame {
     private final JButton orderButton=UiStyle.button("<html><center>주문관리<br><br>주문 확인 · 제작완료<br>주문 취소</center></html>");
     private final JButton menuButton=UiStyle.button("<html><center>메뉴관리<br><br>메뉴 추가 · 삭제 · 품절</center></html>");
@@ -9,13 +9,17 @@ public class AdminMainForm extends JFrame {
     private final JButton logoutButton=UiStyle.button("로그아웃");
     public AdminMainForm(String loginId) {
         super("카페 관리자 메인");setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(null);UiStyle.frame(this,920,470);setResizable(false);
-        JLabel title=new JLabel("관리자 메인");title.setFont(new Font("SansSerif",Font.BOLD,24));title.setBounds(35,25,250,40);add(title);
-        logoutButton.setBounds(740,30,130,36);add(logoutButton);
-        JLabel greeting=new JLabel("관리자님");greeting.setBounds(35,95,250,25);add(greeting);
-        JLabel guide=new JLabel("관리할 항목을 선택해주세요.");guide.setBounds(35,128,500,25);add(guide);
-        orderButton.setBounds(35,185,265,160);menuButton.setBounds(320,185,265,160);salesButton.setBounds(605,185,265,160);
-        add(orderButton);add(menuButton);add(salesButton);
+        UiStyle.frame(this,920,710);setResizable(false);
+        JPanel background=new JPanel(new BorderLayout());background.setBackground(UiStyle.BACKGROUND);
+        background.setBorder(BorderFactory.createEmptyBorder(30,55,30,55));
+        JPanel content=new JPanel(null);content.setBackground(Color.WHITE);content.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY,2));
+        background.add(content);setContentPane(background);
+        JLabel title=new JLabel("관리자 메인");title.setFont(new Font("SansSerif",Font.BOLD,24));title.setBounds(35,25,250,40);content.add(title);
+        logoutButton.setBounds(650,30,100,40);content.add(logoutButton);
+        JSeparator line=new JSeparator();line.setBounds(35,105,715,1);content.add(line);
+        JLabel guide=new JLabel("관리할 항목을 선택해주세요.");guide.setBounds(35,140,500,30);guide.setFont(new Font("SansSerif",Font.PLAIN,20));content.add(guide);
+        orderButton.setBounds(35,235,205,210);menuButton.setBounds(290,235,205,210);salesButton.setBounds(545,235,205,210);
+        content.add(orderButton);content.add(menuButton);content.add(salesButton);
     }
     public JButton getOrderButton(){return orderButton;}
     public JButton getMenuButton(){return menuButton;}

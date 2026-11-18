@@ -5,9 +5,11 @@ public class AdminLoginForm extends JFrame {
     private final AdminLoginPanel loginPanel;
     public AdminLoginForm() {
         super("카페 관리자 로그인");setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        add(UiStyle.header("관리자 로그인","카페 관리자 전용 프로그램"),BorderLayout.NORTH);
-        loginPanel=new AdminLoginPanel();add(loginPanel,BorderLayout.CENTER);
-        getRootPane().setDefaultButton(loginPanel.getLoginButton());UiStyle.frame(this,560,440);setResizable(false);
+        JPanel background=new JPanel(new java.awt.GridBagLayout());background.setBackground(UiStyle.BACKGROUND);
+        loginPanel=new AdminLoginPanel();loginPanel.setPreferredSize(new java.awt.Dimension(560,360));
+        loginPanel.setBorder(BorderFactory.createLineBorder(java.awt.Color.DARK_GRAY,2));
+        background.add(loginPanel);add(background,BorderLayout.CENTER);
+        getRootPane().setDefaultButton(loginPanel.getLoginButton());UiStyle.frame(this,760,560);setResizable(false);
     }
     public JTextField getIdField(){return loginPanel.getIdField();}
     public JPasswordField getPasswordField(){return loginPanel.getPasswordField();}
