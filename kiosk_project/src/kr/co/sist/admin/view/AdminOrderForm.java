@@ -18,22 +18,27 @@ public class AdminOrderForm extends JFrame {
     private boolean busy;
     public AdminOrderForm() {
         super("관리자 주문 관리");setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        add(UiStyle.header("주문 관리","5초마다 새 주문을 조회합니다. 제작중 주문만 취소할 수 있습니다."),BorderLayout.NORTH);
-       
+        JPanel heading=new JPanel(new BorderLayout());heading.setBackground(UiStyle.BACKGROUND);
+        heading.setBorder(BorderFactory.createEmptyBorder(20,28,5,28));
+        JLabel title=new JLabel("주문 관리");title.setFont(new Font("SansSerif",Font.BOLD,24));title.setForeground(Color.WHITE);heading.add(title);add(heading,BorderLayout.NORTH);
+        // 완료 탭은 조회 전용이므로 작업 버튼 두 열을 화면에서 제거합니다.
         configureCompletedTable(completedTable);
         tabs.addTab("주문 내역",new JScrollPane(makingTable));tabs.addTab("완료",new JScrollPane(completedTable));
-        JPanel body=new JPanel(new BorderLayout(0,14));body.setBackground(Color.WHITE);body.setBorder(BorderFactory.createEmptyBorder(20,25,10,25));body.add(tabs,BorderLayout.CENTER);
-        JPanel summary=new JPanel(new BorderLayout());summary.setBackground(Color.WHITE);counts.setFont(counts.getFont().deriveFont(Font.BOLD,16f));summary.add(counts,BorderLayout.WEST);summary.add(status,BorderLayout.EAST);body.add(summary,BorderLayout.SOUTH);add(body,BorderLayout.CENTER);
-        JPanel bottom=new JPanel(new BorderLayout());bottom.setBackground(Color.WHITE);bottom.setBorder(BorderFactory.createEmptyBorder(5,18,15,18));
-        JPanel left=new JPanel(new FlowLayout(FlowLayout.LEFT));left.setBackground(Color.WHITE);left.add(refreshButton);left.add(detailButton);
-        JPanel right=new JPanel(new FlowLayout(FlowLayout.RIGHT));right.setBackground(Color.WHITE);right.add(backButton);
+        JPanel body=new JPanel(new BorderLayout(0,14));body.setBackground(UiStyle.BACKGROUND);body.setBorder(BorderFactory.createEmptyBorder(20,25,10,25));body.add(tabs,BorderLayout.CENTER);
+        JPanel summary=new JPanel(new BorderLayout());summary.setBackground(Color.WHITE);counts.setFont(counts.getFont().deriveFont(Font.BOLD,16f));summary.add(counts,BorderLayout.WEST);summary.add(status,BorderLayout.EAST);JPanel foot=new JPanel(new BorderLayout(0,10));foot.setBackground(UiStyle.BACKGROUND);
+        JLabel hint=new JLabel("5초마다 새 주문을 조회합니다. 제작중 주문만 취소할 수 있습니다.");hint.setForeground(Color.WHITE);
+        foot.add(hint,BorderLayout.NORTH);summary.setBackground(new Color(242,242,242));summary.setBorder(BorderFactory.createEmptyBorder(12,15,12,15));
+        foot.add(summary,BorderLayout.SOUTH);body.add(foot,BorderLayout.SOUTH);add(body,BorderLayout.CENTER);
+        JPanel bottom=new JPanel(new BorderLayout());bottom.setBackground(new Color(242,242,242));bottom.setBorder(BorderFactory.createEmptyBorder(5,18,15,18));
+        JPanel left=new JPanel(new FlowLayout(FlowLayout.LEFT));left.setBackground(new Color(242,242,242));left.add(refreshButton);left.add(detailButton);
+        JPanel right=new JPanel(new FlowLayout(FlowLayout.RIGHT));right.setBackground(new Color(242,242,242));right.add(backButton);
         cancelButton.setForeground(new Color(158,45,45));bottom.add(left,BorderLayout.WEST);bottom.add(right,BorderLayout.EAST);add(bottom,BorderLayout.SOUTH);
         makingTable.getSelectionModel().addListSelectionListener(e->updateActions());completedTable.getSelectionModel().addListSelectionListener(e->updateActions());tabs.addChangeListener(e->updateActions());
         UiStyle.frame(this,1220,730);updateActions();
     }
     public static JTable createOrderTable(OrderTableModel model) {
         JTable table=new JTable(model);table.setRowHeight(42);table.setAutoCreateRowSorter(true);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);table.setFillsViewportHeight(true);table.setShowVerticalLines(false);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);table.setFillsViewportHeight(true);table.setShowVerticalLines(true);table.setBackground(Color.WHITE);table.setGridColor(new Color(190,190,190));
         table.getTableHeader().setReorderingAllowed(false);table.getTableHeader().setPreferredSize(new Dimension(0,36));
         int[] widths={85,320,75,110,80,85,95,95};for(int i=0;i<widths.length;i++)table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
         DefaultTableCellRenderer center=new DefaultTableCellRenderer();
@@ -41,7 +46,9 @@ public class AdminOrderForm extends JFrame {
         center.setBorder(BorderFactory.createEmptyBorder(0,8,0,8));
         for(int column:new int[]{0,2,4,5})table.getColumnModel().getColumn(column).setCellRenderer(center);
         if(table.getTableHeader().getDefaultRenderer() instanceof DefaultTableCellRenderer){
-            ((DefaultTableCellRenderer)table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+            DefaultTableCellRenderer header=new DefaultTableCellRenderer();header.setHorizontalAlignment(SwingConstants.CENTER);
+            header.setBackground(UiStyle.BUTTON);header.setOpaque(true);header.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            table.getTableHeader().setDefaultRenderer(header);
         }
         table.getColumnModel().getColumn(6).setCellRenderer(new OrderActionRenderer());
         table.getColumnModel().getColumn(7).setCellRenderer(new OrderActionRenderer());
