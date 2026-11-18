@@ -25,7 +25,7 @@ public class KioskMain {
 
             // 팀원 기능 연결
             initializeTeamIntegration();
-
+ 
             // 메인 화면 생성 및 표시
             new MainForm().setVisible(true);
         });
