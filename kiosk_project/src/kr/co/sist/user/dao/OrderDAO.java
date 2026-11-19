@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import kr.co.sist.common.db.DbConn;
 import kr.co.sist.user.dto.OrderDTO;
 import kr.co.sist.user.dto.OrderDetailDTO;
 import kr.co.sist.user.dto.OrderOptionDTO;
@@ -25,7 +26,7 @@ public class OrderDAO {
     }
 
     public long selectNextOrderId(Connection conn) throws SQLException {
-        long nextId = 0L;
+        long nextId = 1L;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
@@ -41,6 +42,84 @@ public class OrderDAO {
             DbConn.getInstance().dbClose(rs, pstmt, null);
         }
         return nextId;
+    }
+
+    /**
+     * 1번 파트 MenuDTO 연동 전후 모두 안전하게 동작하도록 메뉴명으로 유효한 MENU_ID를 조회한다.
+     * 일치하는 메뉴명이 없으면 MENU 테이블의 최소 MENU_ID를 반환해 FK(ORA-02291) 오류를 방지한다.
+     */
+    public long selectMenuIdByName(Connection conn, String menuName) throws SQLException {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            if (menuName != null && !menuName.isBlank()) {
+                String sql = "SELECT MENU_ID FROM MENU WHERE MENU_NAME = ? AND ROWNUM = 1";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, menuName.trim());
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getLong("MENU_ID");
+                }
+                DbConn.getInstance().dbClose(rs, pstmt, null);
+                rs = null;
+                pstmt = null;
+            }
+
+            String fallbackSql = "SELECT NVL(MIN(MENU_ID), 1) FROM MENU";
+            pstmt = conn.prepareStatement(fallbackSql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+        } finally {
+            DbConn.getInstance().dbClose(rs, pstmt, null);
+        }
+        return 1L;
+    }
+
+    public int selectBasePriceByMenuId(Connection conn, long menuId, int fallbackPrice) throws SQLException {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        String sql = "SELECT BASE_PRICE FROM MENU WHERE MENU_ID = ?";
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, menuId);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("BASE_PRICE");
+            }
+        } finally {
+            DbConn.getInstance().dbClose(rs, pstmt, null);
+        }
+        return fallbackPrice;
+    }
+
+    /**
+     * 2번 파트 OptionEvt에서 optionId가 미설정(0)된 경우 옵션명으로 MENU_OPTION 테이블의 OPTION_ID를 조회한다.
+     */
+    public long selectOptionIdByName(Connection conn, String optionName) throws SQLException {
+        if (optionName == null || optionName.isBlank()) {
+            return 0L;
+        }
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        String sql = "SELECT OPTION_ID FROM MENU_OPTION WHERE UPPER(TRIM(OPTION_NAME)) = UPPER(TRIM(?)) AND ROWNUM = 1";
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, optionName);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getLong("OPTION_ID");
+            }
+        } finally {
+            DbConn.getInstance().dbClose(rs, pstmt, null);
+        }
+        return 0L;
     }
 
     public int insertOrder(Connection conn, OrderDTO order) throws SQLException {
@@ -133,7 +212,11 @@ public class OrderDAO {
                    + "FROM ORDER_DETAIL WHERE ORDER_ID = ? ORDER BY DETAIL_ID ASC";
 
         try {
-            conn = DbConn.getInstance().getConn();
+            DbConn db = DbConn.getInstance();
+            conn = db.getConn(db.getProp(null));
+            if (conn == null) {
+                throw new SQLException("DB 연결 실패: config/database.properties 경로 또는 설정을 확인하세요.");
+            }
             pstmt = conn.prepareStatement(sql);
             pstmt.setLong(1, orderId);
             rs = pstmt.executeQuery();
