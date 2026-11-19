@@ -18,17 +18,10 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-/**
- * 달력 팝업 (화면설계서의 회색 디자인에 맞춤). 날짜를 클릭하면 선택되고 창이 닫힌다.
- * 외부 jar 없이 자바 기본 기능(java.time)만 사용한다.
- *
- * 사용법: LocalDate d = DatePickerDialog.showDialog(부모컴포넌트, 처음보여줄날짜);
- *        (선택 없이 닫으면 null)
- */
 public class DatePickerDialog extends JDialog {
 
-	private YearMonth current; // 지금 보여주는 연/월
-	private LocalDate selected; // 사용자가 고른 날짜
+	private YearMonth current;
+	private LocalDate selected;
 	private final LocalDate today = LocalDate.now();
 	private JLabel monthLabel;
 	private JPanel dayPanel;
@@ -51,7 +44,7 @@ public class DatePickerDialog extends JDialog {
 		headerPanel.add(monthLabel, BorderLayout.CENTER);
 		headerPanel.add(nextButton, BorderLayout.EAST);
 
-		dayPanel = new JPanel(new GridLayout(0, 7, 4, 4)); // 7칸(일~토)씩 줄바꿈
+		dayPanel = new JPanel(new GridLayout(0, 7, 4, 4)); 
 		dayPanel.setOpaque(false);
 
 		JPanel root = new JPanel(new BorderLayout(0, 10));
@@ -77,7 +70,6 @@ public class DatePickerDialog extends JDialog {
 		setLocationRelativeTo(owner);
 	}
 
-	/** 현재 연/월의 달력을 다시 그린다 */
 	private void drawCalendar() {
 		monthLabel.setText(current.getYear() + "년 " + current.getMonthValue() + "월");
 		dayPanel.removeAll();
@@ -87,11 +79,10 @@ public class DatePickerDialog extends JDialog {
 			JLabel nameLabel = new JLabel(dayNames[i], SwingConstants.CENTER);
 			nameLabel.setFont(new Font(SalesForm.FONT_NAME, Font.BOLD, 13));
 			nameLabel.setOpaque(true);
-			nameLabel.setBackground(SalesForm.BTN_GRAY); // 요일 머리글은 표 머리글과 같은 회색
+			nameLabel.setBackground(SalesForm.BTN_GRAY); 
 			dayPanel.add(nameLabel);
 		}
 
-		// 1일이 무슨 요일인지 → 그 앞을 빈칸으로 채움 (getValue: 월=1 ... 일=7 → 일요일을 0으로)
 		int blank = current.atDay(1).getDayOfWeek().getValue() % 7;
 		for (int i = 0; i < blank; i++) {
 			dayPanel.add(new JLabel(""));
@@ -101,12 +92,12 @@ public class DatePickerDialog extends JDialog {
 			final int day = d;
 			JButton dayButton = new SalesForm.RoundButton(String.valueOf(day));
 			dayButton.setMargin(new Insets(2, 2, 2, 2));
-			if (current.atDay(day).equals(today)) { // 오늘 날짜는 굵게
+			if (current.atDay(day).equals(today)) { 
 				dayButton.setFont(new Font(SalesForm.FONT_NAME, Font.BOLD, 14));
 			}
 			dayButton.addActionListener(e -> {
 				selected = current.atDay(day);
-				dispose(); // 팝업 닫기
+				dispose(); 
 			});
 			dayPanel.add(dayButton);
 		}
@@ -115,10 +106,10 @@ public class DatePickerDialog extends JDialog {
 		dayPanel.repaint();
 	}
 
-	/** 팝업을 띄우고, 사용자가 고른 날짜를 돌려준다 (그냥 닫으면 null) */
+
 	public static LocalDate showDialog(Component parent, LocalDate init) {
 		DatePickerDialog dialog = new DatePickerDialog(SwingUtilities.getWindowAncestor(parent), init);
-		dialog.setVisible(true); // 닫힐 때까지 여기서 멈춰 있다
+		dialog.setVisible(true);
 		return dialog.selected;
 	}
 
