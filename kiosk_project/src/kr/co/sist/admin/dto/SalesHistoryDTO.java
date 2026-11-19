@@ -1,17 +1,14 @@
 package kr.co.sist.admin.dto;
 
-/**
- * 결제 내역 "한 줄"을 담는 상자(DTO)
- * 화면 표의 한 행(주문번호/결제일시/결제방식/결제금액/상태)과 1:1로 대응된다.
- */
+
 public class SalesHistoryDTO {
 
-	private long orderId; // 주문 고유번호 (DB 내부용 PK)
-	private String orderNo; // 고객에게 보이는 주문번호 (화면 '주문번호' 칸)
-	private String paymentDate; // 결제일시 (예: 2026-11-02 09:12)
-	private String paymentMethod; // 결제방식 (카드 / 현금)
-	private String paymentStatus; // 상태 (결제완료)
-	private int paymentAmount; // 결제금액
+	private long orderId;
+	private String orderNo; 
+	private String paymentDate;
+	private String paymentMethod; 
+	private String paymentStatus; 
+	private int paymentAmount;
 
 	public SalesHistoryDTO() {
 	}
