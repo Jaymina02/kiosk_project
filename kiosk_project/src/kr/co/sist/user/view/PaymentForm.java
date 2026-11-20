@@ -18,9 +18,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
+import kr.co.sist.user.dto.CartDTO;
 import kr.co.sist.user.dto.OrderDTO;
 import kr.co.sist.user.dto.OrderDetailDTO;
 import kr.co.sist.user.evt.PaymentEvt;
+import kr.co.sist.user.service.CartListService;
 
 public class PaymentForm extends JFrame {
     private static final long serialVersionUID = 1L;

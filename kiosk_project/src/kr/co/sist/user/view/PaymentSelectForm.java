@@ -20,7 +20,10 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
+import kr.co.sist.user.dto.CartDTO;
+import kr.co.sist.user.dto.MenuOptionDTO;
 import kr.co.sist.user.evt.PaymentSelectEvt;
+import kr.co.sist.user.service.CartListService;
 
 public class PaymentSelectForm extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -65,7 +68,10 @@ public class PaymentSelectForm extends JFrame {
         titleLabel.setFont(new Font("맑은 고딕", Font.BOLD, 28));
         titleLabel.setForeground(Color.WHITE);
 
-        String orderTypeText = CartListService.getOrderType() != null ? CartListService.getOrderType() : "매장";
+        String rawOrderType = CartListService.getOrderType();
+        String orderTypeText = ("TAKE_OUT".equalsIgnoreCase(rawOrderType)
+                || "TAKEOUT".equalsIgnoreCase(rawOrderType)
+                || "포장".equals(rawOrderType)) ? "포장" : "매장";
         jlblOrderType = new JLabel("주문 구분: " + orderTypeText);
         jlblOrderType.setFont(new Font("맑은 고딕", Font.BOLD, 22));
         jlblOrderType.setForeground(new Color(250, 204, 21));
@@ -90,6 +96,8 @@ public class PaymentSelectForm extends JFrame {
 
         String[] cols = {"메뉴명", "선택 옵션", "수량", "금액"};
         dtmCheckoutItems = new DefaultTableModel(cols, 0) {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -196,6 +204,9 @@ public class PaymentSelectForm extends JFrame {
 
     public void returnToPreviousForm() {
         dispose();
+        if (CartListService.getCartItems() != null && !CartListService.getCartItems().isEmpty()) {
+            new CartForm();
+        }
     }
 
     public int getSelectedPaymentType() {

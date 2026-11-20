@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import kr.co.sist.common.db.DbConn;
 import kr.co.sist.user.dto.PaymentDTO;
 
 public class PaymentDAO {
