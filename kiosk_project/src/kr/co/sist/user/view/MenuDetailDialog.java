@@ -527,4 +527,4 @@ public class MenuDetailDialog extends JDialog {
         return value == null ? "" : value;
     }
 }
-//
+
