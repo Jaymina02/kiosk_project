@@ -31,3 +31,4 @@ public class MenuDetailEvt {
         dialog.closeDetail();
     }
 }
+//

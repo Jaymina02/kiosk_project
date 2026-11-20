@@ -2,17 +2,21 @@
 package kr.co.sist.user.run;
 
 import javax.swing.SwingUtilities;
-import javax.swing.JOptionPane;
 
 import kr.co.sist.user.view.MainForm;
 import kr.co.sist.user.view.MenuForm;
+import kr.co.sist.user.view.MenuDetailDialog;
+import kr.co.sist.user.view.OptionDialog;
+import kr.co.sist.user.view.PaymentSelectForm;
+import kr.co.sist.user.service.CartListService;
 
 /**
  * 카페 키오스크 프로그램 실행 클래스
  *
  * 1번 담당자 실행 진입점
  *
- * 메인 화면 -> 메뉴 화면 -> 결제 선택
+ * 메인 화면 → 메뉴 조회 → 상품 상세
+ * → 옵션 선택 → 장바구니 → 결제
  */
 public class KioskMain {
 
@@ -23,9 +27,9 @@ public class KioskMain {
 
         SwingUtilities.invokeLater(() -> {
 
-            // 팀원 기능 연결
+            // 1번, 2번, 3번 담당자 기능 연결
             initializeTeamIntegration();
- 
+
             // 메인 화면 생성 및 표시
             new MainForm().setVisible(true);
         });
@@ -37,74 +41,59 @@ public class KioskMain {
     private static void initializeTeamIntegration() {
 
         // ====================================
-        // 3번 담당자 결제 화면 연결
+        // 1번 → 2번 : 옵션 선택 화면 연결
         // ====================================
 
         /*
-         * 3번 담당자의 PaymentSelectForm은
-         * 매개변수 없는 생성자를 사용한다.
-         *
-         * 현재는 컴파일 단계의 의존성을
-         * 줄이기 위해 리플렉션으로 호출한다.
-         *
-         * 3번 담당자의 결제 코드와
-         * 장바구니 코드가 준비되어 있어야
-         * 정상 실행된다.
+         * 메뉴 상세 화면에서 옵션 선택 버튼 클릭 시
+         * 선택한 MenuDTO를 OptionDialog에 전달한다.
          */
-        MenuForm.setPaymentHandler(() -> {
-
-            try {
-
-                Class<?> clazz =
-                    Class.forName(
-                        "kr.co.sist.user.view."
-                        + "PaymentSelectForm"
-                    );
-
-                clazz.getDeclaredConstructor()
-                     .newInstance();
-
-            } catch (
-                ReflectiveOperationException
-                    | LinkageError ex
-            ) {
-
-                ex.printStackTrace();
-
-                JOptionPane.showMessageDialog(
-                    null,
-                    "3번 담당자의 결제 화면을 "
-                    + "실행할 수 없습니다.\n"
-                    + "PaymentSelectForm 및 "
-                    + "장바구니 연동 상태를 "
-                    + "확인하세요.\n"
-                    + ex,
-                    "결제 화면 연결 오류",
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
-        });
+        MenuDetailDialog.setOptionHandler(
+            menu -> new OptionDialog(menu)
+        );
 
         // ====================================
-        // 2번 담당자 기능 연결 예정
+        // 2번 → 1번 : 장바구니 정보 연결
         // ====================================
 
         /*
-         * 2번 담당자의 실제 코드를 받은 후
-         * 다음 기능을 연결한다.
+         * 2번 담당자의 CartListService에서
+         * 장바구니에 담긴 총 수량과 총금액을 가져온다.
          *
-         * 1. OptionDialog 열기
-         * 2. 장바구니 상품 개수 조회
-         * 3. 장바구니 총금액 조회
-         * 4. 매장 / 포장 주문유형 전달
+         * MenuForm 하단에 표시되는
+         * 담은 상품 수량 / 합계 금액에 사용한다.
+         */
+        MenuForm.setCartSummarySuppliers(
+            CartListService::getCartItemCount,
+            CartListService::getCartTotalAmount
+        );
+
+        // ====================================
+        // 1번 → 3번 : 결제 화면 연결
+        // ====================================
+
+        /*
+         * 메뉴 화면 하단의 결제 버튼 클릭 시
+         * 3번 담당자의 결제수단 선택 화면을 실행한다.
          *
-         * 연결 대상 메서드:
+         * 장바구니가 비어 있는 경우에는
+         * MenuForm에서 결제를 제한한다.
+         */
+        MenuForm.setPaymentHandler(
+            () -> new PaymentSelectForm()
+        );
+
+        // ====================================
+        // 매장 / 포장 주문 유형 연결
+        // ====================================
+
+        /*
+         * MainForm의 주문 유형 선택 기능은
+         * MainForm.setOrderTypeHandler(...)의
+         * 실제 매개변수 형식을 확인한 후 연결한다.
          *
-         * MenuDetailDialog.setOptionHandler(...)
-         *
-         * MenuForm.setCartSummarySuppliers(...)
-         *
-         * MainForm.setOrderTypeHandler(...)
+         * CartListService.setOrderType(...) 메서드는
+         * 2번 담당자 코드에 구현되어 있다.
          */
     }
 }
