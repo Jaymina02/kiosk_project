@@ -11,155 +11,100 @@ import kr.co.sist.user.dto.MenuDTO;
 import kr.co.sist.user.dto.MenuOptionDTO;
 
 /**
- * 카페 키오스크 메뉴 서비스
+ * 사용자 메뉴 서비스
  *
- * [1번 담당]
- * 1. 카테고리 조회
- * 2. 메뉴 목록 조회
- * 3. 메뉴 상세 조회
+ * 1번 담당:
+ * - 카테고리 조회
+ * - 메뉴 목록 조회
+ * - 메뉴 상세 조회
  *
- * [2번 담당]
- * 4. 전체 메뉴 옵션 조회 및 CSV 변환
- * 5. 특정 메뉴 옵션 조회
- *
- * 1번, 2번 담당 기능 통합
+ * 2번 담당:
+ * - 전체 옵션 조회
+ * - 메뉴별 옵션 조회
  */
 public class MenuService {
 
-    private final MenuDAO menuDAO =
-            MenuDAO.getInstance();
+    private final MenuDAO menuDAO;
 
-    // =========================================
-    // 1. 카테고리 조회 - 1번 담당
-    // =========================================
+    public MenuService() {
+        this.menuDAO = MenuDAO.getInstance();
+    }
+
+    // ========================================
+    // 1번 담당 - 카테고리 조회
+    // ========================================
 
     public List<CategoryDTO> searchCategories() {
-
         return menuDAO.selectCategories();
     }
 
-    // =========================================
-    // 2. 메뉴 목록 조회 - 1번 담당
-    // =========================================
+    // ========================================
+    // 1번 담당 - 메뉴 목록 조회
+    // ========================================
 
-    public List<MenuDTO> searchMenus(
-            long categoryId) {
-
+    public List<MenuDTO> searchMenus(long categoryId) {
         return menuDAO.selectMenus(categoryId);
     }
 
-    // =========================================
-    // 3. 메뉴 상세 조회 - 1번 담당
-    // =========================================
+    // ========================================
+    // 1번 담당 - 메뉴 상세 조회
+    // ========================================
 
-    public MenuDTO searchMenuDetail(
-            long menuId) {
-
+    public MenuDTO searchMenuDetail(long menuId) {
         return menuDAO.selectMenuById(menuId);
     }
 
-    // =========================================
-    // 4. 전체 메뉴 옵션 조회 - 2번 담당
-    // =========================================
+    // ========================================
+    // 2번 담당 - 전체 옵션 조회
+    // ========================================
 
     /**
-     * 2번 담당자 기존 메서드 유지
-     *
-     * MENU_OPTION의 전체 옵션을 조회한 뒤
-     * CSV 문자열 형태의 리스트로 변환
-     *
-     * 반환 예시:
-     *
-     * 1,SIZE,null,null,Regular,null,0,0,0,0,null,null,
+     * 2번 담당자 기존 반환 형식 유지:
+     * MenuOptionDTO 목록을 CSV 문자열 목록으로 변환
      */
     public List<String> searchMenuOptions() {
 
-        List<String> listMenuOption =
-                new ArrayList<>();
+        List<String> result = new ArrayList<>();
 
         try {
 
-            List<MenuOptionDTO> tempList =
-                    menuDAO.selectMenuOptions();
+            List<MenuOptionDTO> options =
+                menuDAO.selectMenuOptions();
 
-            StringBuilder csvData =
-                    new StringBuilder();
+            for (MenuOptionDTO dto : options) {
 
-            for (MenuOptionDTO dto : tempList) {
+                StringBuilder csv = new StringBuilder();
 
-                csvData.setLength(0);
+                csv.append(dto.getOptionId()).append(",");
+                csv.append(dto.getOptionType()).append(",");
+                csv.append(dto.getTemperature()).append(",");
+                csv.append(dto.getSize()).append(",");
+                csv.append(dto.getOptionName()).append(",");
+                csv.append(dto.getMenuName()).append(",");
+                csv.append(dto.getOptionPrice()).append(",");
+                csv.append(dto.getBasePrice()).append(",");
+                csv.append(dto.getQuantity()).append(",");
+                csv.append(dto.getTotalAmount()).append(",");
+                csv.append(dto.getThumbnailPath()).append(",");
+                csv.append(dto.getExtraOptionNames()).append(",");
 
-                csvData
-                        .append(dto.getOptionId())
-                        .append(",")
-
-                        .append(dto.getOptionType())
-                        .append(",")
-
-                        .append(dto.getTemperature())
-                        .append(",")
-
-                        .append(dto.getSize())
-                        .append(",")
-
-                        .append(dto.getOptionName())
-                        .append(",")
-
-                        .append(dto.getMenuName())
-                        .append(",")
-
-                        .append(dto.getOptionPrice())
-                        .append(",")
-
-                        .append(dto.getBasePrice())
-                        .append(",")
-
-                        .append(dto.getQuantity())
-                        .append(",")
-
-                        .append(dto.getTotalAmount())
-                        .append(",")
-
-                        .append(dto.getThumbnailPath())
-                        .append(",")
-
-                        .append(dto.getExtraOptionNames())
-                        .append(",");
-
-                listMenuOption.add(
-                        csvData.toString()
-                );
+                result.add(csv.toString());
             }
 
         } catch (SQLException e) {
-
             throw new IllegalStateException(
-                    "전체 MENU_OPTION 조회 실패",
-                    e
+                "메뉴 옵션 조회 실패", e
             );
         }
 
-        return listMenuOption;
+        return result;
     }
 
-    // =========================================
-    // 5. 특정 메뉴 옵션 조회 - 1번 + 2번
-    // =========================================
+    // ========================================
+    // 1번·2번 연동 - 메뉴별 옵션 조회
+    // ========================================
 
-    /**
-     * 메뉴 ID에 따라 선택 가능한 옵션 조회
-     *
-     * 예:
-     * 아메리카노 선택 ->
-     * Regular, Large, 샷 추가 등
-     *
-     * @param menuId 메뉴 ID
-     * @return 해당 메뉴에 연결된 옵션 DTO 목록
-     */
-    public List<MenuOptionDTO> searchMenuOptions(
-            long menuId) {
-
+    public List<MenuOptionDTO> searchMenuOptions(long menuId) {
         return menuDAO.selectMenuOptions(menuId);
     }
 }
-//
