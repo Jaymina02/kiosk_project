@@ -245,8 +245,6 @@ public class OptionDialog extends JDialog {
 			return;
 		}
 
-		lblMenuName.setText("아메리카노");
-		lblBasePrice.setText("1,800 원");
 	}
 
 	public void displayTemperatureOptions() {
