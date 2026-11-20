@@ -75,8 +75,12 @@ public class OptionEvt implements ActionListener {
 	 * 메뉴 기본가격+추가옵션 가격의 총 합계 금액을 계산하는 일
 	 */
 	public int calculatePreviewTotal() {
-		int basePrice = 1800; // MenuDTO 연결 전 임시 기본 가격
-
+		int basePrice = 0; // MenuDTO 연결 전 임시 기본 가격 및 초기화
+		
+		if (optionDialog.getSelectedMenu() != null) {
+			basePrice = optionDialog.getSelectedMenu().getBasePrice();
+		}
+		
 		int optionTotal = 0; // 추가 옵션 합계
 
 		// 사이즈 추가금 (Large 선택 시 +500원)
@@ -103,7 +107,7 @@ public class OptionEvt implements ActionListener {
 	 */
 	public CartDTO buildCartItem() {
 		CartDTO cart = new CartDTO();
-		cart.setTempMenuName(optionDialog.getLblMenuName().getText());
+		cart.setMenu(optionDialog.getSelectedMenu());
 
 		// 1. 온도 옵션
 		MenuOptionDTO tempDto = new MenuOptionDTO();
