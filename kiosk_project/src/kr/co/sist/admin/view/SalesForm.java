@@ -34,6 +34,8 @@ import kr.co.sist.admin.dto.SalesHistoryDTO;
 import kr.co.sist.admin.dto.SalesSummaryDTO;
 import kr.co.sist.admin.evt.SalesEvt;
 
+import kr.co.sist.admin.common.AdminApplication;
+
 public class SalesForm extends JFrame {
 
 	static final Color FRAME_GRAY = new Color(0xA6A6A6);
@@ -52,11 +54,13 @@ public class SalesForm extends JFrame {
 	private JButton searchButton, todayButton, monthButton, adminMainButton;
 	private JPanel resultPanel; 
 	private SalesEvt salesEvt;
-
+	private AdminApplication app;
+	
 	private final DecimalFormat moneyFormat = new DecimalFormat("#,##0");
 
-	public SalesForm() {
-		super("정산 · 매출조회");
+	public SalesForm(AdminApplication app) {
+	    super("정산 · 매출조회");
+	    this.app = app;
 
 		JLabel titleLabel = new JLabel("정산 · 매출조회");
 		titleLabel.setFont(new Font(FONT_NAME, Font.BOLD, 26));
@@ -209,10 +213,12 @@ public class SalesForm extends JFrame {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setVisible(true);
 	}
-
 	
+	public SalesForm() {
+	    this(null);
+	}
 
-	private JTextField makeDateField(String text) {
+		private JTextField makeDateField(String text) {
 		JTextField field = new JTextField(text, 8);
 		field.setFont(new Font(FONT_NAME, Font.PLAIN, 13));
 		field.setEditable(false); 
@@ -320,6 +326,10 @@ public class SalesForm extends JFrame {
 
 	public JButton getAdminMainButton() {
 		return adminMainButton;
+	}
+	
+	public AdminApplication getApp() {
+	    return app;
 	}
 
 	public boolean isStartTarget(Object src) {
