@@ -276,6 +276,6 @@ public class OptionDialog extends JDialog {
 	}
 
 	public void openPaymentSelectForm() {
-	//new PaymentForm(); // 결제 폼 연결
+		new PaymentSelectForm(); // 결제 선택 폼 연결
 	}
 }
