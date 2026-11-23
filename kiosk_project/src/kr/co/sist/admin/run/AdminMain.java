@@ -3,12 +3,20 @@ package kr.co.sist.admin.run;
 import java.awt.Font;
 import java.util.Enumeration;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
-import kr.co.sist.admin.common.*;
-import kr.co.sist.admin.dao.*;
-import kr.co.sist.admin.service.*;
+import kr.co.sist.admin.common.AdminApplication;
+import kr.co.sist.admin.common.ConnectionProvider;
+import kr.co.sist.admin.common.TeamConnectionProvider;
+import kr.co.sist.admin.dao.AdminDAO;
+import kr.co.sist.admin.dao.OrderDAO;
+import kr.co.sist.admin.dao.PaymentDAO;
+import kr.co.sist.admin.service.AdminService;
+import kr.co.sist.admin.service.CancelService;
+import kr.co.sist.admin.service.OrderService;
+import kr.co.sist.admin.view.AdminMenuForm;
 import kr.co.sist.admin.view.SalesForm;
 
 public class AdminMain {
@@ -33,7 +41,10 @@ public class AdminMain {
                 connections, orderDAO, new PaymentDAO())
         );
 
-        // 관리자 메인의 매출조회 버튼 연결
+        // 메뉴관리 연결
+        app.setMenuAction(() -> new AdminMenuForm(app));
+
+        // 매출조회 연결
         app.setSalesAction(() -> new SalesForm(app));
 
         return app;
