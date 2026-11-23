@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 
 import kr.co.sist.admin.common.AdminApplication;
 import kr.co.sist.admin.view.AdminMainForm;
-import kr.co.sist.admin.view.AdminMenuForm;
 
 public class AdminMainEvt implements ActionListener {
 	private final AdminMainForm form;
@@ -16,9 +15,9 @@ public class AdminMainEvt implements ActionListener {
 		this.app = app;
 		form.getOrderButton().addActionListener(this);
 		form.getLogoutButton().addActionListener(this);
-		form.getMenuButton().setEnabled(true);
+		form.getMenuButton().setEnabled(app.hasMenuAction());
 		form.getSalesButton().setEnabled(app.hasSalesAction());
-		form.getMenuButton().setToolTipText(null);
+		form.getMenuButton().setToolTipText(app.hasMenuAction() ? null : "아직 연결되지 않은 화면입니다.");
 		form.getSalesButton().setToolTipText(app.hasSalesAction() ? null : "아직 연결되지 않은 화면입니다.");
 		form.getMenuButton().addActionListener(this);
 		form.getSalesButton().addActionListener(this);
@@ -34,9 +33,9 @@ public class AdminMainEvt implements ActionListener {
 			form.dispose();
 			app.openLogin();
 		} else if (source == form.getMenuButton()) {
-			new AdminMenuForm(); // 메뉴 관리 창 열기
-		}
-		else if (source == form.getSalesButton())
+			form.dispose(); // 메인을 닫고 메뉴 관리 화면으로 이동
+			app.openMenu();
+		} else if (source == form.getSalesButton())
 			app.openSales();
 	}
 }
