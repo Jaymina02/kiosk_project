@@ -97,12 +97,8 @@ public class MenuDetailDialog extends JDialog {
      */
     public MenuDetailDialog(Frame owner, long menuId) {
 
-<<<<<<< HEAD
         super(owner, "메뉴 상세", true);
         
-=======
-        super(owner, "상품 상세", true);
->>>>>>> refs/remotes/origin/lsj
 
         // =====================================
         // 1. 메뉴 상세 정보 조회
@@ -513,12 +509,7 @@ public class MenuDetailDialog extends JDialog {
 
             return;
         }
-<<<<<<< HEAD
         dispose();
-=======
-
-        // 기존 연동 방식 유지
->>>>>>> refs/remotes/origin/lsj
         optionHandler.accept(selectedMenu);
     }
 

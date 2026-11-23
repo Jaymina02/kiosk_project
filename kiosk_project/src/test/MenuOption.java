@@ -17,7 +17,7 @@ class MenuOption {
 		
 		MenuService ms=new MenuService();
 //		System.out.println(ms.searchMenuOptions());
-		assertEquals(ms.searchMenuOptions().size(),8);
+		assertEquals(ms.searchMenuOptions(1L).size(),8);
 	}
 
 }
