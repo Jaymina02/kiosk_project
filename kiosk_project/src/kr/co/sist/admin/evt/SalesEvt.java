@@ -37,12 +37,7 @@ public class SalesEvt extends MouseAdapter implements ActionListener {
 	    } else if (src == salesForm.getMonthButton()) {
 	        searchThisMonth();
 	    } else if (src == salesForm.getAdminMainButton()) {
-	        if (salesForm.getApp() != null) {
-	            salesForm.getApp().openMain();
-	            salesForm.dispose();
-	        } else {
-	            JOptionPane.showMessageDialog(salesForm, "관리자 메인 화면과 연결되어 있지 않습니다.");
-	        }
+	        salesForm.dispose();
 	    }
 	}
 
