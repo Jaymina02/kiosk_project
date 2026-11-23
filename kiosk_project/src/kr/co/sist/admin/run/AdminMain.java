@@ -1,11 +1,21 @@
 package kr.co.sist.admin.run;
 import java.awt.Font;
 import java.util.Enumeration;
-import javax.swing.*;
+
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
-import kr.co.sist.admin.common.*;
-import kr.co.sist.admin.dao.*;
-import kr.co.sist.admin.service.*;
+
+import kr.co.sist.admin.common.AdminApplication;
+import kr.co.sist.admin.common.ConnectionProvider;
+import kr.co.sist.admin.common.TeamConnectionProvider;
+import kr.co.sist.admin.dao.AdminDAO;
+import kr.co.sist.admin.dao.OrderDAO;
+import kr.co.sist.admin.dao.PaymentDAO;
+import kr.co.sist.admin.service.AdminService;
+import kr.co.sist.admin.service.CancelService;
+import kr.co.sist.admin.service.OrderService;
+import kr.co.sist.admin.view.AdminMenuForm;
 
 public class AdminMain {
     public static void main(String[] args){
@@ -16,7 +26,14 @@ public class AdminMain {
     public static void start(ConnectionProvider connections){launch(createDatabaseApplication(connections));}
     public static AdminApplication createDatabaseApplication(ConnectionProvider connections){
         OrderDAO orderDAO=new OrderDAO(connections);
-        return new AdminApplication(new AdminService(new AdminDAO(connections)),new OrderService(connections,orderDAO),new CancelService(connections,orderDAO,new PaymentDAO()));
+        final AdminApplication app=new AdminApplication(new AdminService(new AdminDAO(connections)),new OrderService(connections,orderDAO),new CancelService(connections,orderDAO,new PaymentDAO()));
+        app.setMenuAction(new Runnable(){
+            @Override
+            public void run(){
+                new AdminMenuForm(app); // 메뉴 관리 화면 열기
+            }
+        });
+        return app;
     }
     public static void launch(AdminApplication app){
         SwingUtilities.invokeLater(()->{
