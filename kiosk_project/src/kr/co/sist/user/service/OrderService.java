@@ -159,6 +159,7 @@ public class OrderService {
     public List<OrderDetailDTO> searchOrderDetails(long orderId) throws SQLException {
         return orderDAO.selectOrderDetails(orderId);
     }
+<<<<<<< HEAD
     public OrderDTO searchOrder(long orderId) throws SQLException {
         return orderDAO.selectOneOrder(orderId);
     }
@@ -166,4 +167,6 @@ public class OrderService {
     public OrderDTO searchOrderByNo(String orderNo) throws SQLException {
         return orderDAO.selectOrderByNo(orderNo);
     }
+=======
+>>>>>>> refs/remotes/origin/lsj
 }

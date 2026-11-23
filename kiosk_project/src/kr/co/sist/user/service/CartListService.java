@@ -122,6 +122,7 @@ public class CartListService {
 	}//setOrderType
 
 	public static void setDirectOrderItem(CartDTO item) {
+<<<<<<< HEAD
 		if (item == null) {
 			CartListService.directOrderItem = null;
 			return;
@@ -135,6 +136,9 @@ public class CartListService {
 			// 장바구니가 비어있으면 기존처럼 바로 주문 칸에 단독 저장
 			CartListService.directOrderItem = item;
 		}//end else
+=======
+		CartListService.directOrderItem = item;
+>>>>>>> refs/remotes/origin/lsj
 	}//setDirectOrderItem
 
 	// 바로 주문 아이템이 있으면 그것만 반환, 없으면 장바구니 전체 반환
