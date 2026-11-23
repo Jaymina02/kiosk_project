@@ -250,10 +250,10 @@ public class PaymentForm extends JFrame {
         }
     }
 
-//    public void openOrderCompleteForm(OrderDTO order, List<OrderDetailDTO> details) {
-//        new OrderCompleteForm(order, details);
-//        dispose();
-//    }
+    public void openOrderCompleteForm(OrderDTO order, List<OrderDetailDTO> details) {
+        new OrderCompleteForm(order, details);
+        dispose();
+    }
 
     public void returnToPaymentSelect() {
         new PaymentSelectForm();
