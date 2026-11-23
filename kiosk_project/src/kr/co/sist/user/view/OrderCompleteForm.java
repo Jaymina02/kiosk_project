@@ -40,4 +40,8 @@ public class OrderCompleteForm extends JFrame {
     public List<OrderDetailDTO> getDetails() {
         return details;
     }
+
+	public Object getJbtnMain() {
+		return null;
+	}
 }

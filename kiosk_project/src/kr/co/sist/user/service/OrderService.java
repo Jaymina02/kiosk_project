@@ -159,4 +159,11 @@ public class OrderService {
     public List<OrderDetailDTO> searchOrderDetails(long orderId) throws SQLException {
         return orderDAO.selectOrderDetails(orderId);
     }
+    public OrderDTO searchOrder(long orderId) throws SQLException {
+        return orderDAO.selectOneOrder(orderId);
+    }
+
+    public OrderDTO searchOrderByNo(String orderNo) throws SQLException {
+        return orderDAO.selectOrderByNo(orderNo);
+    }
 }

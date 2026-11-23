@@ -195,8 +195,9 @@ public class OptionEvt implements ActionListener {
 		CartListService.setDirectOrderItem(buildCartItem());
 
 		// 현재 옵션 창 닫고 결제 선택 화면 열기
-		optionDialog.closeDialog();
 		optionDialog.openPaymentSelectForm();
+		
+		
 	}// orderNow
 
 	// --- [기타 메서드] ---

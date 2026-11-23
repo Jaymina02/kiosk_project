@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import kr.co.sist.user.dto.CartDTO;
 import kr.co.sist.user.dto.MenuOptionDTO;
@@ -58,10 +60,8 @@ public class CartForm extends JDialog {
 		pnlCenter.add(scrollPane, BorderLayout.CENTER);
 
 		JPanel pnlSummary = new JPanel(new BorderLayout());
-		pnlSummary.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createLineBorder(Color.GRAY),
-				BorderFactory.createEmptyBorder(15, 15, 15, 15)
-		));
+		pnlSummary.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY),
+				BorderFactory.createEmptyBorder(15, 15, 15, 15)));
 
 		lblTotalCountTitle = new JLabel("총 결제 금액 (0개)");
 		lblTotalAmount = new JLabel("0 원", SwingConstants.RIGHT);
@@ -85,7 +85,7 @@ public class CartForm extends JDialog {
 		pnlBottom.add(btnOrder);
 		add(pnlBottom, BorderLayout.SOUTH);
 
-		// 3. 이벤트 등록 및 초기 데이터 화면 출력 
+		// 3. 이벤트 등록 및 초기 데이터 화면 출력
 		this.cartEvt = new CartEvt(this);
 		this.cartItems = CartListService.getCartItems();
 
@@ -116,17 +116,15 @@ public class CartForm extends JDialog {
 	private JPanel createItemCard(CartDTO item, int index) {
 		JPanel card = new JPanel(new BorderLayout(10, 5));
 		card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 110));
-		card.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createLineBorder(Color.GRAY),
-				BorderFactory.createEmptyBorder(10, 15, 10, 15)
-		));
+		card.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY),
+				BorderFactory.createEmptyBorder(10, 15, 10, 15)));
 
 		// 상단: 메뉴명(온도, 사이즈) + 삭제 버튼
 		JPanel pnlTop = new JPanel(new BorderLayout());
 		String titleText = item.getMenuName();
 		if (item.getTemperatureOption() != null && item.getSizeOption() != null) {
-			titleText += "(" + item.getTemperatureOption().getOptionName() + ", "
-					+ item.getSizeOption().getOptionName() + ")";
+			titleText += "(" + item.getTemperatureOption().getOptionName() + ", " + item.getSizeOption().getOptionName()
+					+ ")";
 		}
 		JLabel lblTitle = new JLabel(titleText);
 
@@ -174,7 +172,7 @@ public class CartForm extends JDialog {
 	}
 
 	public void displaySelectedOptions() {
-	}//displaySelectedOptions
+	}// displaySelectedOptions
 
 	private String getExtraOptionText(CartDTO item) {
 		List<MenuOptionDTO> extras = item.getExtraOptions();
@@ -186,7 +184,7 @@ public class CartForm extends JDialog {
 			names.add(opt.getOptionName());
 		}
 		return "- 옵션 : " + String.join(", ", names);
-	}//getExtraOptionText
+	}// getExtraOptionText
 
 	public void displayTotalAmount() {
 		int totalCount = CartListService.getCartItemCount();
@@ -194,18 +192,52 @@ public class CartForm extends JDialog {
 
 		lblTotalCountTitle.setText("총 결제 금액 (" + totalCount + "개)");
 		lblTotalAmount.setText(String.format("%,d 원", totalPrice));
-	}//displayTotalAmount
+	}// displayTotalAmount
 
 	public void refreshCartView() {
 		pnlListContainer.revalidate();
 		pnlListContainer.repaint();
-	}//refreshCartView
+	}// refreshCartView
 
 	public void openMenuForm() {
-		dispose();
-	}//openMenuForm
+	    Window[] windows = Window.getWindows();
+	    
+	    for (int i = windows.length - 1; i >= 0; i--) {
+	        Window w = windows[i];
+	        String className = w.getClass().getSimpleName();
+	        
+	        // 1. MenuForm과 자바 내부 시스템 창(SharedOwnerFrame)은 절대 건드리지 않음!
+	        if (!className.equals("MenuForm") && !className.contains("SharedOwnerFrame")) {
+	            w.setVisible(false);
+	            w.dispose();
+	        }
+	    }
 
-	public void openPaymentSelectForm() {
-		dispose();
-	}//openPaymentSelectForm
+	    SwingUtilities.invokeLater(() -> {
+	        for (Window w : Window.getWindows()) {
+	            if (w.getClass().getSimpleName().equals("MenuForm") && w.isDisplayable()) {
+	                ((MenuForm) w).refreshCartSummary();
+	                w.setVisible(true);
+	                w.toFront();
+	                return;
+	            }
+	        }
+	        new MenuForm().setVisible(true);
+	    });
+	}// openMenuForm
+
+public void openPaymentSelectForm() {
+	 for (Window w : Window.getWindows()) {
+	        String className = w.getClass().getSimpleName();
+	        
+	        if (className.equals("MenuForm")) {
+	            w.setVisible(false);
+	        } else if (!className.contains("SharedOwnerFrame")) {
+	            w.setVisible(false);
+	            w.dispose();
+	        }
+	    }
+
+	    new PaymentSelectForm();
+	}// openPaymentSelectForm
 }

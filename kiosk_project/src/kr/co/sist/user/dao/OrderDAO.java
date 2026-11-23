@@ -44,10 +44,6 @@ public class OrderDAO {
         return nextId;
     }
 
-    /**
-     * 1번 파트 MenuDTO 연동 전후 모두 안전하게 동작하도록 메뉴명으로 유효한 MENU_ID를 조회한다.
-     * 일치하는 메뉴명이 없으면 MENU 테이블의 최소 MENU_ID를 반환해 FK(ORA-02291) 오류를 방지한다.
-     */
     public long selectMenuIdByName(Connection conn, String menuName) throws SQLException {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -237,5 +233,70 @@ public class OrderDAO {
             DbConn.getInstance().dbClose(rs, pstmt, conn);
         }
         return list;
+    }
+    public OrderDTO selectOneOrder(long orderId) throws SQLException {
+        OrderDTO dto = null;
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        String sql = "SELECT ORDER_ID, ORDER_NO, ORDER_TYPE, TOTAL_AMOUNT, ORDER_STATUS, ORDER_DATE "
+                   + "FROM ORDERS WHERE ORDER_ID = ?";
+
+        try {
+            DbConn db = DbConn.getInstance();
+            conn = db.getConn(db.getProp(null));
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, orderId);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                dto = new OrderDTO();
+                dto.setOrderId(rs.getLong("ORDER_ID"));
+                dto.setOrderNo(rs.getString("ORDER_NO"));
+                dto.setOrderType(rs.getString("ORDER_TYPE"));
+                dto.setTotalAmount(rs.getInt("TOTAL_AMOUNT"));
+                dto.setOrderStatus(rs.getInt("ORDER_STATUS"));
+                if (rs.getTimestamp("ORDER_DATE") != null) {
+                    dto.setOrderDate(rs.getTimestamp("ORDER_DATE").toLocalDateTime());
+                }
+            }
+        } finally {
+            DbConn.getInstance().dbClose(rs, pstmt, conn);
+        }
+        return dto;
+    }
+
+    public OrderDTO selectOrderByNo(String orderNo) throws SQLException {
+        OrderDTO dto = null;
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        String sql = "SELECT ORDER_ID, ORDER_NO, ORDER_TYPE, TOTAL_AMOUNT, ORDER_STATUS, ORDER_DATE "
+                   + "FROM ORDERS WHERE ORDER_NO = ?";
+
+        try {
+            DbConn db = DbConn.getInstance();
+            conn = db.getConn(db.getProp(null));
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, orderNo);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                dto = new OrderDTO();
+                dto.setOrderId(rs.getLong("ORDER_ID"));
+                dto.setOrderNo(rs.getString("ORDER_NO"));
+                dto.setOrderType(rs.getString("ORDER_TYPE"));
+                dto.setTotalAmount(rs.getInt("TOTAL_AMOUNT"));
+                dto.setOrderStatus(rs.getInt("ORDER_STATUS"));
+                if (rs.getTimestamp("ORDER_DATE") != null) {
+                    dto.setOrderDate(rs.getTimestamp("ORDER_DATE").toLocalDateTime());
+                }
+            }
+        } finally {
+            DbConn.getInstance().dbClose(rs, pstmt, conn);
+        }
+        return dto;
     }
 }
