@@ -53,7 +53,7 @@ public class PaymentEvt implements ActionListener {
                     "결제가 완료되었습니다.\n주문번호: " + order.getOrderNo(),
                     "결제 완료", JOptionPane.INFORMATION_MESSAGE);
 
-            form.openOrderCompleteForm(order, details);
+//            form.openOrderCompleteForm(order, details);
 
         } catch (SQLException ex) {
             ex.printStackTrace();
