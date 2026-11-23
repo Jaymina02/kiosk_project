@@ -2,7 +2,6 @@ package kr.co.sist.user.evt;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -100,7 +99,7 @@ public class CartEvt implements ActionListener {
 	 * 메뉴 더 담기 클릭 시 창 닫고 메뉴판으로 복귀
 	 */
 	public void addMoreMenu() {
-		cartForm.openMenuForm();
+		cartForm.openMenuForm();  
 	}// addMoreMenu
 
 	/**
