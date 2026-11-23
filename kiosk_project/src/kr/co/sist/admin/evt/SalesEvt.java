@@ -52,7 +52,7 @@ public class SalesEvt extends MouseAdapter implements ActionListener {
 			}
 	}
 
-	
+
 	public void searchSales() {
 		String startDate = salesForm.getStartDate();
 		String endDate = salesForm.getEndDate();
