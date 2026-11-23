@@ -35,7 +35,7 @@ import kr.co.sist.admin.dto.SalesSummaryDTO;
 import kr.co.sist.admin.evt.SalesEvt;
 
 import kr.co.sist.admin.common.AdminApplication;
-
+import java.awt.Window;
 public class SalesForm extends JFrame {
 
 	static final Color FRAME_GRAY = new Color(0xA6A6A6);
@@ -211,6 +211,15 @@ public class SalesForm extends JFrame {
 		setSize(940, 700);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
+		// 메인 창이 떠 있으면 닫기 (화면전환)
+		if (app != null) {
+			for (Window w : Window.getWindows()) {
+				if (w instanceof AdminMainForm && w.isDisplayable()) {
+					w.dispose();
+				}
+			}
+		}
 		setVisible(true);
 	}
 	
