@@ -15,6 +15,7 @@ import kr.co.sist.admin.dto.SalesSummaryDTO;
 import kr.co.sist.admin.service.SalesService;
 import kr.co.sist.admin.view.SalesForm;
 
+
 public class SalesEvt extends MouseAdapter implements ActionListener {
 
 	private SalesForm salesForm;
@@ -27,18 +28,22 @@ public class SalesEvt extends MouseAdapter implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Object src = e.getSource(); 
+	    Object src = e.getSource();
 
-		if (src == salesForm.getSearchButton()) {
-			searchSales();
-		} else if (src == salesForm.getTodayButton()) {
-			searchToday();
-		} else if (src == salesForm.getMonthButton()) {
-			searchThisMonth();
-		} else if (src == salesForm.getAdminMainButton()) {
-			salesForm.dispose();
-			
-		}
+	    if (src == salesForm.getSearchButton()) {
+	        searchSales();
+	    } else if (src == salesForm.getTodayButton()) {
+	        searchToday();
+	    } else if (src == salesForm.getMonthButton()) {
+	        searchThisMonth();
+	    } else if (src == salesForm.getAdminMainButton()) {
+	        if (salesForm.getApp() != null) {
+	            salesForm.getApp().openMain();
+	            salesForm.dispose();
+	        } else {
+	            JOptionPane.showMessageDialog(salesForm, "관리자 메인 화면과 연결되어 있지 않습니다.");
+	        }
+	    }
 	}
 
 	
