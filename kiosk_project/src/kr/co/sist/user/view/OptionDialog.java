@@ -6,11 +6,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -20,6 +22,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import kr.co.sist.user.dto.MenuDTO;
 import kr.co.sist.user.dto.MenuOptionDTO;
@@ -29,7 +32,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OptionDialog extends JDialog {
-
 	private OptionEvt optionEvt;
 	private MenuDTO selectedMenu;
 	private MenuOptionDTO temperatureOption;
@@ -242,10 +244,21 @@ public class OptionDialog extends JDialog {
 		if (selectedMenu != null) {
 			lblMenuName.setText(selectedMenu.getMenuName());
 			lblBasePrice.setText(String.format("%,d 원", selectedMenu.getBasePrice()));
+			
+			// 썸네일 이미지 불러오기 (가로 100, 세로 100 크기)
+			ImageIcon icon = MenuForm.loadScaledIcon(
+					selectedMenu.getThumbnailPath(), 100, 100
+			);
+			
+			if (icon != null) {
+				lblImage.setIcon(icon);
+				lblImage.setText(""); // 이미지가 정상 로딩되면 기존 "이미지" 글자 지우기
+			}
+			
 			return;
 		}
 
-	}
+	}//displayMenuInfo
 
 	public void displayTemperatureOptions() {
 	}
@@ -276,6 +289,21 @@ public class OptionDialog extends JDialog {
 	}
 
 	public void openPaymentSelectForm() {
-	//new PaymentForm(); // 결제 폼 연결
-	}
-}
+		 // 1.  OptionDialog 등 팝업만 닫기
+	    for (Window w : Window.getWindows()) {
+	        String className = w.getClass().getSimpleName();
+	        
+	        if (!className.equals("MenuForm") && !className.contains("SharedOwnerFrame")) {
+	            w.setVisible(false);
+	            w.dispose();
+	        }
+	    }
+
+	    // 2. 결제 선택 창을 띄우고 맨 앞으로 가져오기
+	    SwingUtilities.invokeLater(() -> {
+	        PaymentSelectForm paymentForm = new PaymentSelectForm();
+	        paymentForm.toFront();
+	        paymentForm.requestFocus();
+	    });
+	}//openPaymentSelectForm
+}//class
