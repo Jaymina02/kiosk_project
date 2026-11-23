@@ -139,7 +139,7 @@ public class OptionDialog extends JDialog {
 		chkShot = new JCheckBox("샷 추가 (+500원)");
 		chkSoyMilk = new JCheckBox("두유 (+500원)");
 		chkMilk = new JCheckBox("우유추가 (+500원)");
-		chkDecaf = new JCheckBox("디카페인 샷 추가 (+600원)");
+		chkDecaf = new JCheckBox("디카페인 변경 (+600원)");
 
 		pnlExtraChk.add(chkVanilla);
 		pnlExtraChk.add(chkHazelnut);
