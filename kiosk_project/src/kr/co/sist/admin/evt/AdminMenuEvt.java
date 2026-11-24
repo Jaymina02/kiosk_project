@@ -43,7 +43,7 @@ public class AdminMenuEvt implements ActionListener {
 		this.menuService = new MenuService();
 	}
 
-	/** 처음 화면이 뜰 때 카테고리와 메뉴 목록을 DB에서 읽어온다 */
+	/* 처음 화면이 뜰 때 카테고리와 메뉴 목록을 DB에서 읽어온다 */
 	public void initData() {
 		try {
 			menuForm.setCategories(menuService.searchCategories());
@@ -75,7 +75,7 @@ public class AdminMenuEvt implements ActionListener {
 		}
 	}
 
-	/** 선택된 카테고리(전체=0)로 메뉴 목록 조회 */
+	/* 선택된 카테고리(전체=0)로 메뉴 목록 조회 */
 	public void searchAdminMenus() {
 		long categoryId = menuForm.getSelectedCategoryId();
 		try {
@@ -161,7 +161,7 @@ public class AdminMenuEvt implements ActionListener {
 		}
 	}
 
-	/** 선택된 메뉴의 MENU_ID, 선택이 없으면 안내 후 -1 */
+	/* 선택된 메뉴의 MENU_ID, 선택이 없으면 안내 후 -1 */
 	private long requireSelection() {
 		long menuId = menuForm.getSelectedMenuId();
 		if (menuId < 0) {
@@ -170,13 +170,13 @@ public class AdminMenuEvt implements ActionListener {
 		return menuId;
 	}
 
-	// ------------------------------------------------------------ 상품 상세 (adminMenuDetail)
+	// 상품 상세
 
 	private static final Color DETAIL_OUTER = new Color(140, 140, 140);
 	private static final Color DETAIL_LINE = new Color(120, 120, 120);
 	private static final Color DETAIL_LABEL_BG = new Color(221, 221, 221);
 
-	/** 메뉴명을 클릭하면 열리는 상품 상세 팝업 (기획서 20p) */
+	/* 메뉴명을 클릭하면 열리는 상품 상세 팝업  */
 	public void openDetailDialog() {
 		long menuId = menuForm.getSelectedMenuId();
 		if (menuId < 0) {
@@ -351,7 +351,7 @@ public class AdminMenuEvt implements ActionListener {
 		d.setVisible(true);
 	}
 
-	/** [회색 라벨 | 값] 한 줄 */
+	/* [회색 라벨 | 값] 한 줄 */
 	private JPanel infoRow(String label, String value) {
 		JLabel l = new JLabel(label, SwingConstants.CENTER);
 		l.setOpaque(true);
@@ -388,7 +388,7 @@ public class AdminMenuEvt implements ActionListener {
 		return b;
 	}
 
-	/** 경로로 이미지를 찾아 크기를 맞춰 반환, 없으면 null */
+	/* 경로로 이미지를 찾아 크기를 맞춰 반환, 없으면 null */
 	private ImageIcon loadImage(String path, int w, int h) {
 		BufferedImage img = MenuImageUtil.read(path);
 		if (img == null) {

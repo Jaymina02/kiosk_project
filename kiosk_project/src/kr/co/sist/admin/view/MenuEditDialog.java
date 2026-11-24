@@ -42,7 +42,7 @@ import kr.co.sist.admin.dto.MenuDTO;
 import kr.co.sist.admin.dto.MenuOptionDTO;
 import kr.co.sist.admin.evt.MenuEditEvt;
 
-/** 메뉴 추가 / 수정 팝업. 생성자에 MenuDTO 를 넘기면 수정, null 이면 추가 */
+/* 메뉴 추가 / 수정 팝업. 생성자에 MenuDTO 를 넘기면 수정, null 이면 추가 */
 public class MenuEditDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 
@@ -50,9 +50,9 @@ public class MenuEditDialog extends JDialog {
 	public static final int GROUP_SIZE = 1;
 	public static final int GROUP_EXTRA = 2;
 
-	/** 카페인과 옵션(온도/사이즈/추가 옵션)을 아예 쓰지 않는 카테고리 ID (4 = 디저트) */
+	/* 카페인과 옵션(온도/사이즈/추가 옵션)을 아예 쓰지 않는 카테고리 ID (4 = 디저트) */
 	private static final long[] NO_OPTION_CATEGORY_IDS = { 4 };
-	/** 온도에서 ICE 만 쓰는 카테고리 ID (3 = 스무디) */
+	/* 온도에서 ICE 만 쓰는 카테고리 ID (3 = 스무디) */
 	private static final long[] ICE_ONLY_CATEGORY_IDS = { 3 };
 
 	private static final Color OUTER = new Color(140, 140, 140);
@@ -227,8 +227,6 @@ public class MenuEditDialog extends JDialog {
 		categoryCombo.addActionListener(ev -> updateOptionVisibility()); // 카테고리를 바꾸면 줄을 보이고 숨김
 	}
 
-	// ---------------------------------------------------------------- 모양 도우미
-
 	private JTextField textField() {
 		JTextField f = new JTextField();
 		f.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LINE),
@@ -284,7 +282,7 @@ public class MenuEditDialog extends JDialog {
 		b.setFont(b.getFont().deriveFont(Font.BOLD, 12f));
 	}
 
-	// ---------------------------------------------------------------- 데이터 세팅
+	// 데이터 세팅
 
 	public void setCategories(List<CategoryDTO> list) {
 		categoryCombo.removeAllItems();
@@ -293,7 +291,7 @@ public class MenuEditDialog extends JDialog {
 		}
 	}
 
-	/** DB의 옵션 목록으로 체크박스를 만든다 (이름으로 온도/사이즈/추가 옵션 분류) */
+	/* DB의 옵션 목록으로 체크박스를 만든다 (이름으로 온도/사이즈/추가 옵션 분류) */
 	public void setOptionChoices(List<MenuOptionDTO> options) {
 		temperatureChoices.removeAll();
 		sizeChoices.removeAll();
@@ -336,7 +334,7 @@ public class MenuEditDialog extends JDialog {
 		}
 	}
 
-	/** 옵션 이름으로 그룹 분류 */
+	/* 옵션 이름으로 그룹 분류 */
 	public static int optionGroup(MenuOptionDTO o) {
 		String n = o.getOptionName() == null ? "" : o.getOptionName().trim().toUpperCase();
 		if (n.equals("HOT") || n.equals("ICE") || n.contains("온도")) {
@@ -373,7 +371,7 @@ public class MenuEditDialog extends JDialog {
 		showExistingImage(dto.getImagePath());
 	}
 
-	/** 이미 등록된 이미지가 있으면 미리보기에 보여준다 */
+	/* 이미 등록된 이미지가 있으면 미리보기에 보여준다 */
 	private void showExistingImage(String path) {
 		BufferedImage img = MenuImageUtil.read(path);
 		if (img != null) {
@@ -381,7 +379,7 @@ public class MenuEditDialog extends JDialog {
 		}
 	}
 
-	/** 이미지 등록 버튼으로 고른 파일을 미리보기에 보여준다. 읽을 수 없는 파일이면 false */
+	/* 이미지 등록 버튼으로 고른 파일을 미리보기에 보여준다. 읽을 수 없는 파일이면 false */
 	public boolean setPickedImage(File file) {
 		if (!showPreview(file)) {
 			return false;
@@ -411,7 +409,7 @@ public class MenuEditDialog extends JDialog {
 		return true;
 	}
 
-	/** 입력값으로 MenuDTO 생성 (가격 검증은 MenuEditEvt.validateMenu 에서 먼저 한다) */
+	/* 입력값으로 MenuDTO 생성 (가격 검증은 MenuEditEvt.validateMenu 에서 먼저 한다) */
 	public MenuDTO getMenuData() {
 		MenuDTO dto = new MenuDTO();
 		if (menuDTO != null) {
@@ -445,17 +443,17 @@ public class MenuEditDialog extends JDialog {
 		return false;
 	}
 
-	/** 선택된 카테고리가 옵션을 쓰지 않는 카테고리(디저트)인지 */
+	/* 선택된 카테고리가 옵션을 쓰지 않는 카테고리(디저트)인지 */
 	private boolean isOptionHidden() {
 		return contains(NO_OPTION_CATEGORY_IDS, selectedCategoryId());
 	}
 
-	/** 선택된 카테고리가 온도에서 HOT 을 쓰지 않는 카테고리(스무디)인지 */
+	/* 선택된 카테고리가 온도에서 HOT 을 쓰지 않는 카테고리(스무디)인지 */
 	private boolean isHotHidden() {
 		return contains(ICE_ONLY_CATEGORY_IDS, selectedCategoryId());
 	}
 
-	/** 카테고리에 맞게 옵션 줄(온도/사이즈/추가 옵션)과 HOT 체크박스를 보이고 숨긴다 */
+	/* 카테고리에 맞게 옵션 줄(온도/사이즈/추가 옵션)과 HOT 체크박스를 보이고 숨긴다 */
 	private void updateOptionVisibility() {
 		boolean showOptions = !isOptionHidden();
 		for (Component c : new Component[] { caffeineGap, caffeineRow, optionGap, temperatureRow, sizeGap, sizeRow,
@@ -485,7 +483,7 @@ public class MenuEditDialog extends JDialog {
 		return selectedOptionIds;
 	}
 
-	/** 사이즈 옵션이 등록되어 있다면 하나 이상 선택되었는지 (사이즈는 필수, 디저트는 제외) */
+	/* 사이즈 옵션이 등록되어 있다면 하나 이상 선택되었는지 (사이즈는 필수, 디저트는 제외) */
 	public boolean isSizeSelected() {
 		if (isOptionHidden() || sizeOptionIds.isEmpty()) {
 			return true;
