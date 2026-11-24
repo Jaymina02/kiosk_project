@@ -2,16 +2,42 @@ package kr.co.sist.user.evt;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
+import kr.co.sist.user.service.CartListService;
+import kr.co.sist.user.view.MainForm;
 import kr.co.sist.user.view.OrderCompleteForm;
 
-public class OrderCompleteEvt implements ActionListener {
+public class OrderCompleteEvt extends WindowAdapter implements ActionListener {
     private OrderCompleteForm form;
+    private Timer autoReturnTimer;
+    private int remainSeconds = 5;
+    private boolean moved = false;
 
     public OrderCompleteEvt(OrderCompleteForm form) {
         this.form = form;
+        this.form.addWindowListener(this);
+        startAutoReturnTimer();
+    }
+
+    private void startAutoReturnTimer() {
+        form.getJbtnMain().setText("처음으로 (" + remainSeconds + "초)");
+
+        autoReturnTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                remainSeconds--;
+                if (remainSeconds > 0) {
+                    form.getJbtnMain().setText("처음으로 (" + remainSeconds + "초)");
+                } else {
+                    returnToMain();
+                }
+            }
+        });
+        autoReturnTimer.start();
     }
 
     @Override
@@ -21,18 +47,28 @@ public class OrderCompleteEvt implements ActionListener {
         }
     }
 
-    public void returnToMain() {
-        form.dispose();
-        try {
-            // 1번 파트 담당자의 MainForm이 main에 병합되기 전에도 컴파일 오류가 나지 않도록 동적 호출
-            Class<?> mainFormClass = Class.forName("kr.co.sist.user.view.MainForm");
-            mainFormClass.getDeclaredConstructor().newInstance();
-        } catch (ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(null,
-                    "주문이 완료되었습니다.\n(MainForm 병합 후 자동으로 첫 화면으로 이동합니다.)",
-                    "안내", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e) {
-            e.printStackTrace();
+    @Override
+    public void windowClosing(WindowEvent e) {
+        if (autoReturnTimer != null) {
+            autoReturnTimer.stop();
         }
+    }
+
+    public void returnToMain() {
+        if (moved) {
+            return;
+        }
+        moved = true;
+
+        if (autoReturnTimer != null) {
+            autoReturnTimer.stop();
+        }
+
+        CartListService.resetOrder();
+        form.dispose();
+
+        MainForm.setOrderTypeHandler(CartListService::setOrderType);
+        MainForm mainForm = new MainForm();
+        mainForm.setVisible(true);
     }
 }

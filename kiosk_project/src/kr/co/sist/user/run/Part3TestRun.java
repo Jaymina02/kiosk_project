@@ -8,12 +8,24 @@ import javax.swing.SwingUtilities;
 import kr.co.sist.user.dto.CartDTO;
 import kr.co.sist.user.dto.MenuOptionDTO;
 import kr.co.sist.user.service.CartListService;
+import kr.co.sist.user.view.MainForm;
 import kr.co.sist.user.view.PaymentSelectForm;
 
 public class Part3TestRun {
+
     public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            MainForm.setOrderTypeHandler(CartListService::setOrderType);
+
+            setupDummyCart();
+
+            new PaymentSelectForm();
+        });
+    }
+
+    public static void setupDummyCart() {
         CartListService.resetOrder();
-        CartListService.setOrderType("EAT_IN");
+        CartListService.setOrderType("매장");
 
         MenuOptionDTO tempOpt = new MenuOptionDTO();
         tempOpt.setOptionType("TEMPERATURE");
@@ -32,16 +44,25 @@ public class Part3TestRun {
         shotOpt.setOptionPrice(500);
         extras.add(shotOpt);
 
-        CartDTO cartItem = new CartDTO();
-        cartItem.setTempMenuName("아메리카노");
-        cartItem.setTemperatureOption(tempOpt);
-        cartItem.setSizeOption(sizeOpt);
-        cartItem.setExtraOptions(extras);
-        cartItem.setQuantity(2);
-        cartItem.setUnitPrice(2800);
+        CartDTO item1 = new CartDTO();
+        item1.setTempMenuName("아메리카노");
+        item1.setTemperatureOption(tempOpt);
+        item1.setSizeOption(sizeOpt);
+        item1.setExtraOptions(extras);
+        item1.setQuantity(2);
+        item1.setUnitPrice(2800);
+        CartListService.addCartItem(item1);
 
-        CartListService.addCartItem(cartItem);
+        MenuOptionDTO hotOpt = new MenuOptionDTO();
+        hotOpt.setOptionType("TEMPERATURE");
+        hotOpt.setOptionName("HOT");
+        hotOpt.setOptionPrice(0);
 
-        SwingUtilities.invokeLater(() -> new PaymentSelectForm());
+        CartDTO item2 = new CartDTO();
+        item2.setTempMenuName("카페라떼");
+        item2.setTemperatureOption(hotOpt);
+        item2.setQuantity(1);
+        item2.setUnitPrice(3500);
+        CartListService.addCartItem(item2);
     }
 }
