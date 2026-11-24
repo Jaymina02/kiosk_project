@@ -42,7 +42,7 @@ import kr.co.sist.admin.dto.MenuDTO;
 import kr.co.sist.admin.dto.MenuOptionDTO;
 import kr.co.sist.admin.evt.MenuEditEvt;
 
-/* 메뉴 추가, 수정 팝업 */
+/* 메뉴 추가 / 수정 팝업. 생성자에 MenuDTO 를 넘기면 수정, null 이면 추가 */
 public class MenuEditDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 
@@ -50,9 +50,11 @@ public class MenuEditDialog extends JDialog {
 	public static final int GROUP_SIZE = 1;
 	public static final int GROUP_EXTRA = 2;
 
-	/* 옵션 */
+	/* 카페인과 옵션(온도/사이즈/추가 옵션)을 아예 쓰지 않는 카테고리 ID (4 = 디저트) */
 	private static final long[] NO_OPTION_CATEGORY_IDS = { 4 };
+	/* 온도에서 ICE 만 쓰는 카테고리 ID (3 = 스무디) */
 	private static final long[] ICE_ONLY_CATEGORY_IDS = { 3 };
+
 	private static final Color OUTER = new Color(140, 140, 140);
 	private static final Color LINE = new Color(120, 120, 120);
 	private static final Color TITLE_BG = new Color(221, 221, 221);
@@ -65,26 +67,27 @@ public class MenuEditDialog extends JDialog {
 	private JTextArea descriptionArea;
 	private JTextField originField;
 	private JCheckBox caffeineCheck;
-	private JTextField imagePathField; 
+	private JTextField imagePathField; // 화면에는 안 보이고 DB에 저장할 경로를 들고 있다
 	private JTextField thumbnailPathField;
 	private JButton saveButton;
 	private JButton cancelButton;
 	private JButton imageButton;
 	private JLabel imagePreview;
-	private MenuDTO menuDTO; 
+	private MenuDTO menuDTO; // null 이면 추가 모드
 	private MenuEditEvt menuEditEvt;
 	private JPanel temperatureChoices;
 	private JPanel sizeChoices;
 	private JPanel extraChoices;
+	// 옵션 줄과 그 위의 여백 (디저트면 모두 숨김)
 	private Component caffeineGap, optionGap, sizeGap, extraGap;
 	private JPanel caffeineRow, temperatureRow, sizeRow, extraRow;
-	private List<Long> hotOptionIds = new ArrayList<>();
+	private List<Long> hotOptionIds = new ArrayList<>(); // HOT 옵션 (스무디면 숨김)
 	private List<Long> selectedOptionIds = new ArrayList<>();
 
 	private AdminMenuForm ownerForm;
 	private Map<Long, JCheckBox> optionChecks = new LinkedHashMap<>();
 	private List<Long> sizeOptionIds = new ArrayList<>();
-	private File pickedImage; 
+	private File pickedImage; // 이미지 등록 버튼으로 고른 파일 (저장할 때 images 폴더로 복사)
 
 	public MenuEditDialog(AdminMenuForm owner, MenuDTO dto) {
 		super(owner, dto == null ? "메뉴 추가" : "메뉴 수정", true);
@@ -127,7 +130,7 @@ public class MenuEditDialog extends JDialog {
 		extraChoices = new JPanel(new GridLayout(0, 3, 8, 6));
 		extraChoices.setOpaque(false);
 
-		// 제목
+		// ---- 제목 ----
 		JLabel title = new JLabel(dto == null ? "메뉴 추가" : "메뉴 수정", SwingConstants.CENTER);
 		title.setFont(title.getFont().deriveFont(Font.BOLD, 17f));
 		title.setOpaque(true);
@@ -135,7 +138,7 @@ public class MenuEditDialog extends JDialog {
 		title.setBorder(BorderFactory.createLineBorder(LINE));
 		title.setPreferredSize(new Dimension(0, 40));
 
-		// 이미지, 이미지 등록, 메뉴명, 가격
+		// ---- 맨 위: 이미지 / 이미지 등록 / 메뉴명 / 가격 ----
 		JPanel top = new JPanel(new GridBagLayout());
 		top.setOpaque(false);
 		top.add(imagePreview, gbc(0, 0, 2, 0, GridBagConstraints.NONE, new Insets(0, 0, 0, 16)));
@@ -154,7 +157,7 @@ public class MenuEditDialog extends JDialog {
 		caffeineBox.setBorder(BorderFactory.createLineBorder(LINE));
 		caffeineBox.add(caffeineCheck);
 
-		// 본문
+		// ---- 본문 ----
 		JPanel body = new JPanel();
 		body.setOpaque(false);
 		body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
@@ -195,7 +198,7 @@ public class MenuEditDialog extends JDialog {
 		card.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LINE),
 				BorderFactory.createEmptyBorder(2, 2, 14, 2)));
 		card.add(title, BorderLayout.NORTH);
-		JPanel bodyWrap = new JPanel(new BorderLayout());
+		JPanel bodyWrap = new JPanel(new BorderLayout()); // 줄이 숨겨져도 남은 줄의 간격이 늘어나지 않게 위쪽에 붙인다
 		bodyWrap.setOpaque(false);
 		bodyWrap.add(body, BorderLayout.NORTH);
 		card.add(bodyWrap, BorderLayout.CENTER);
@@ -215,7 +218,7 @@ public class MenuEditDialog extends JDialog {
 		imageButton.addActionListener(menuEditEvt);
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		pack();
+		pack(); // 모든 줄이 보이는 상태 기준으로 창 크기를 고정한다 (카테고리가 바뀌어도 크기는 그대로)
 		setSize(Math.max(getWidth(), 640), getHeight());
 		setResizable(false);
 		setLocationRelativeTo(owner);
@@ -288,7 +291,7 @@ public class MenuEditDialog extends JDialog {
 		}
 	}
 
-	/* DB의 옵션 목록으로 체크박스 생성 */
+	/* DB의 옵션 목록으로 체크박스를 만든다 (이름으로 온도/사이즈/추가 옵션 분류) */
 	public void setOptionChoices(List<MenuOptionDTO> options) {
 		temperatureChoices.removeAll();
 		sizeChoices.removeAll();
@@ -368,19 +371,15 @@ public class MenuEditDialog extends JDialog {
 		showExistingImage(dto.getImagePath());
 	}
 
-	/* 이미지 미리보기 */
+	/* 이미 등록된 이미지가 있으면 미리보기에 보여준다 */
 	private void showExistingImage(String path) {
-		if (path == null || path.isEmpty()) {
-			return;
-		}
-		for (File f : new File[] { new File("." + path), new File(path) }) {
-			if (f.isFile() && showPreview(f)) {
-				return;
-			}
+		BufferedImage img = MenuImageUtil.read(path);
+		if (img != null) {
+			showPreview(img);
 		}
 	}
 
-	/* 이미지 미리 보기 */
+	/* 이미지 등록 버튼으로 고른 파일을 미리보기에 보여준다. 읽을 수 없는 파일이면 false */
 	public boolean setPickedImage(File file) {
 		if (!showPreview(file)) {
 			return false;
@@ -391,23 +390,26 @@ public class MenuEditDialog extends JDialog {
 
 	private boolean showPreview(File file) {
 		try {
-			BufferedImage img = ImageIO.read(file);
-			if (img == null) {
-				return false;
-			}
-			int boxW = 123, boxH = 103;
-			double scale = Math.min((double) boxW / img.getWidth(), (double) boxH / img.getHeight());
-			int w = Math.max(1, (int) (img.getWidth() * scale));
-			int h = Math.max(1, (int) (img.getHeight() * scale));
-			imagePreview.setIcon(new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH)));
-			imagePreview.setText(null);
-			return true;
+			return showPreview(ImageIO.read(file));
 		} catch (IOException e) {
 			return false;
 		}
 	}
 
-	/* 입력값으로 MenuDTO 생성 */
+	private boolean showPreview(BufferedImage img) {
+		if (img == null) {
+			return false;
+		}
+		int boxW = 123, boxH = 103;
+		double scale = Math.min((double) boxW / img.getWidth(), (double) boxH / img.getHeight());
+		int w = Math.max(1, (int) (img.getWidth() * scale));
+		int h = Math.max(1, (int) (img.getHeight() * scale));
+		imagePreview.setIcon(new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH)));
+		imagePreview.setText(null);
+		return true;
+	}
+
+	/* 입력값으로 MenuDTO 생성 (가격 검증은 MenuEditEvt.validateMenu 에서 먼저 한다) */
 	public MenuDTO getMenuData() {
 		MenuDTO dto = new MenuDTO();
 		if (menuDTO != null) {
@@ -441,17 +443,17 @@ public class MenuEditDialog extends JDialog {
 		return false;
 	}
 
-	/* 선택된 카테고리가 옵션을 쓰지 않는 카테고리 */
+	/* 선택된 카테고리가 옵션을 쓰지 않는 카테고리(디저트)인지 */
 	private boolean isOptionHidden() {
 		return contains(NO_OPTION_CATEGORY_IDS, selectedCategoryId());
 	}
 
-	/* 선택된 카테고리가 온도에서 HOT 을 쓰지 않는 카테고리 */
+	/* 선택된 카테고리가 온도에서 HOT 을 쓰지 않는 카테고리(스무디)인지 */
 	private boolean isHotHidden() {
 		return contains(ICE_ONLY_CATEGORY_IDS, selectedCategoryId());
 	}
 
-	/* 카테고리에 맞게 옵션 표시 */
+	/* 카테고리에 맞게 옵션 줄(온도/사이즈/추가 옵션)과 HOT 체크박스를 보이고 숨긴다 */
 	private void updateOptionVisibility() {
 		boolean showOptions = !isOptionHidden();
 		for (Component c : new Component[] { caffeineGap, caffeineRow, optionGap, temperatureRow, sizeGap, sizeRow,
@@ -466,10 +468,10 @@ public class MenuEditDialog extends JDialog {
 
 	public List<Long> getSelectedOptionIds() {
 		selectedOptionIds = new ArrayList<>();
-		if (isOptionHidden()) { 
+		if (isOptionHidden()) { // 디저트는 옵션을 저장하지 않는다
 			return selectedOptionIds;
 		}
-		boolean skipHot = isHotHidden();
+		boolean skipHot = isHotHidden(); // 스무디는 HOT 을 저장하지 않는다
 		for (Map.Entry<Long, JCheckBox> e : optionChecks.entrySet()) {
 			if (skipHot && hotOptionIds.contains(e.getKey())) {
 				continue;
@@ -481,7 +483,7 @@ public class MenuEditDialog extends JDialog {
 		return selectedOptionIds;
 	}
 
-	/* 사이즈 옵션이 등록되어 있다면 하나 이상 선택되었는지 확인 */
+	/* 사이즈 옵션이 등록되어 있다면 하나 이상 선택되었는지 (사이즈는 필수, 디저트는 제외) */
 	public boolean isSizeSelected() {
 		if (isOptionHidden() || sizeOptionIds.isEmpty()) {
 			return true;

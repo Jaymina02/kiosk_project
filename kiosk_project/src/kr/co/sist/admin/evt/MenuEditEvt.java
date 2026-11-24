@@ -21,10 +21,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import kr.co.sist.admin.dto.MenuDTO;
 import kr.co.sist.admin.service.MenuService;
 import kr.co.sist.admin.view.MenuEditDialog;
+import kr.co.sist.admin.view.MenuImageUtil;
 
 public class MenuEditEvt implements ActionListener {
 	private static final String IMAGE_DIR = "images"; // 실행 폴더 아래 images 폴더에 저장
 	private static final int THUMB_WIDTH = 150;
+	private static final String THUMB_SUFFIX = "_thumb";
 
 	private MenuEditDialog editDialog;
 	private MenuService menuService;
@@ -34,7 +36,7 @@ public class MenuEditEvt implements ActionListener {
 		this.menuService = new MenuService();
 	}
 
-	/** 카테고리/옵션 목록을 DB에서 읽어 화면에 채우고, 수정 모드면 기존 값도 채운다 */
+	/* 카테고리/옵션 목록을 DB에서 읽어 화면에 채우고, 수정 모드면 기존 값도 채운다 */
 	public void initData() {
 		try {
 			editDialog.setCategories(menuService.searchCategories());
@@ -68,7 +70,7 @@ public class MenuEditEvt implements ActionListener {
 		}
 	}
 
-	/** 이미지 등록: 파일 선택창에서 이미지를 고른다 (실제 복사는 저장할 때) */
+	/* 이미지 등록: 파일 선택창에서 이미지를 고른다*/
 	public void chooseImage() {
 		JFileChooser chooser = new JFileChooser();
 		chooser.setDialogTitle("상품 이미지 선택");
@@ -118,7 +120,7 @@ public class MenuEditEvt implements ActionListener {
 		}
 	}
 
-	/** 입력값 검사 */
+	/* 입력값 검사 */
 	public boolean validateMenu() {
 		if (editDialog.getMenuNameField().getText().trim().isEmpty()) {
 			editDialog.showMessage("메뉴명을 입력해주세요.");
@@ -142,7 +144,7 @@ public class MenuEditEvt implements ActionListener {
 		return true;
 	}
 
-	/**
+	/*
 	 * 고른 이미지를 images 폴더로 복사하고 썸네일을 만들어, DB에 저장할 경로(/images/파일명)를 화면에 채운다.
 	 * 이미지를 새로 고르지 않았다면 기존 경로를 그대로 둔다.
 	 */
@@ -157,24 +159,22 @@ public class MenuEditEvt implements ActionListener {
 				editDialog.showMessage("이미지 파일을 읽을 수 없습니다.");
 				return false;
 			}
-			File dir = new File(IMAGE_DIR);
+			File dir = MenuImageUtil.getSaveFolder(); // 기본: 작업 폴더/images 
 			dir.mkdirs();
+			System.out.println("이미지 저장 폴더: " + dir.getAbsolutePath());
 
 			String name = picked.getName();
 			int dot = name.lastIndexOf('.');
 			String base = dot > 0 ? name.substring(0, dot) : name;
 			String ext = dot > 0 ? name.substring(dot) : "";
 
+			// 상세 이미지는 고른 파일 이름 그대로 저장
 			File target = new File(dir, name);
-			if (target.exists() && !Files.isSameFile(target.toPath(), picked.toPath())) {
-				base = base + "_" + System.currentTimeMillis(); // 같은 이름의 다른 파일이 있으면 이름을 바꾼다
-				target = new File(dir, base + ext);
-			}
-			if (!target.exists()) {
+			if (!target.exists() || !Files.isSameFile(target.toPath(), picked.toPath())) {
 				Files.copy(picked.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			}
 
-			// 썸네일 (가로 150px): 상세 이미지가 menu1.png 이면 썸네일은 menu1_1.png 로 저장
+			// 썸네일 (가로 150px)
 			String lower = ext.toLowerCase();
 			boolean supported = lower.equals(".jpg") || lower.equals(".jpeg") || lower.equals(".png")
 					|| lower.equals(".gif") || lower.equals(".bmp");
@@ -193,7 +193,7 @@ public class MenuEditEvt implements ActionListener {
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			g.drawImage(src, 0, 0, w, h, null);
 			g.dispose();
-			String thumbName = base + "_1" + thumbExt;
+			String thumbName = base + THUMB_SUFFIX + thumbExt;
 			if (!ImageIO.write(thumb, format, new File(dir, thumbName))) {
 				throw new IOException("썸네일 저장에 실패했습니다. (" + format + ")");
 			}

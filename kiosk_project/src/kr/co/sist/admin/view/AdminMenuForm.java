@@ -9,10 +9,11 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +45,6 @@ import kr.co.sist.admin.dto.CategoryDTO;
 import kr.co.sist.admin.dto.MenuDTO;
 import kr.co.sist.admin.evt.AdminMenuEvt;
 
-/** 관리자 메뉴 관리 (리스트/조회) 화면 - adminMenuList (기획서 19p) */
 public class AdminMenuForm extends JFrame {
 	private static final long serialVersionUID = 1L;
 
@@ -71,7 +71,7 @@ public class AdminMenuForm extends JFrame {
 	private JButton backButton;
 	private JLabel summaryLabel;
 	private AdminMenuEvt adminMenuEvt;
-	private AdminApplication app; // 뒤로 가기 때 메인으로 돌아가는 데 사용 (없으면 null)
+	private AdminApplication app; // 뒤로 가기 때 메인으로 돌아가는 데 사용
 
 	private List<MenuDTO> menuList = new ArrayList<>(); // 테이블 행 순서와 동일
 	private Map<Long, String> categoryNames = new HashMap<>();
@@ -95,7 +95,7 @@ public class AdminMenuForm extends JFrame {
 		addButton.setPreferredSize(new Dimension(100, 40));
 		for (JButton b : new JButton[] { editButton, soldOutButton, restoreButton, deleteButton }) {
 			styleButton(b, false);
-			b.setPreferredSize(new Dimension(BTN_W, BTN_H)); // 표 안에 그려질 버튼 (클릭은 표에서 처리)
+			b.setPreferredSize(new Dimension(BTN_W, BTN_H));
 		}
 		styleButton(backButton, true);
 		backButton.setPreferredSize(new Dimension(100, 40));
@@ -215,7 +215,6 @@ public class AdminMenuForm extends JFrame {
 		deleteButton.addActionListener(adminMenuEvt);
 		backButton.addActionListener(adminMenuEvt);
 
-		// 표 안의 버튼은 그림이므로, 클릭 위치를 계산해서 같은 이름의 버튼을 눌러준다
 		menuTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -227,7 +226,7 @@ public class AdminMenuForm extends JFrame {
 		if (app != null) {
 			addWindowListener(new WindowAdapter() {
 				@Override
-				public void windowClosed(WindowEvent e) { // 뒤로 가기, 창 닫기 모두 여기로 온다
+				public void windowClosed(WindowEvent e) { // 뒤로 가기
 					AdminMenuForm.this.app.openMain(); // 메인 화면으로 돌아간다
 				}
 			});
@@ -252,7 +251,7 @@ public class AdminMenuForm extends JFrame {
 		if (col < COL_EDIT) {
 			return;
 		}
-		// 버튼 영역(셀 가운데 BTN_W x BTN_H) 안을 눌렀을 때만 동작
+
 		Rectangle cell = menuTable.getCellRect(row, col, false);
 		Rectangle btn = new Rectangle(cell.x + (cell.width - BTN_W) / 2, cell.y + (cell.height - BTN_H) / 2, BTN_W,
 				BTN_H);
@@ -268,7 +267,7 @@ public class AdminMenuForm extends JFrame {
 		}
 	}
 
-	// ------------------------------------------------------------ 데이터 표시
+	// 데이터 표시
 
 	/** 카테고리 필터 버튼 만들기 (맨 앞에 '전체') */
 	public void setCategories(List<CategoryDTO> list) {
@@ -293,7 +292,6 @@ public class AdminMenuForm extends JFrame {
 		categoryPanel.add(b);
 	}
 
-	/** 눌린 카테고리 버튼을 선택 상태로 */
 	public void selectCategory(JButton button) {
 		selectedCategoryId = (Long) button.getClientProperty("categoryId");
 		refreshCategoryStyles();
@@ -325,7 +323,7 @@ public class AdminMenuForm extends JFrame {
 		summaryLabel.setText("등록 메뉴 " + menuList.size() + "개  |  품절 " + soldOut + "개");
 	}
 
-	/** 선택된 행의 MENU_ID, 선택이 없으면 -1 */
+	/* 선택된 행의 MENU_ID, 선택이 없으면 -1 */
 	public long getSelectedMenuId() {
 		int row = menuTable.getSelectedRow();
 		if (row < 0 || row >= menuList.size()) {
@@ -346,17 +344,36 @@ public class AdminMenuForm extends JFrame {
 		return status == 2 ? "삭제" : status == 1 ? "품절" : "판매중";
 	}
 
-	public JTable getMenuTable() { return menuTable; }
-	public JButton getAddButton() { return addButton; }
-	public JButton getEditButton() { return editButton; }
-	public JButton getSoldOutButton() { return soldOutButton; }
-	public JButton getRestoreButton() { return restoreButton; }
-	public JButton getDeleteButton() { return deleteButton; }
-	public JButton getBackButton() { return backButton; }
+	public JTable getMenuTable() {
+		return menuTable;
+	}
 
-	// ------------------------------------------------------------ 모양 관련
+	public JButton getAddButton() {
+		return addButton;
+	}
 
-	/** 어느 Look&Feel 에서도 색이 적용되도록 버튼 꾸미기 */
+	public JButton getEditButton() {
+		return editButton;
+	}
+
+	public JButton getSoldOutButton() {
+		return soldOutButton;
+	}
+
+	public JButton getRestoreButton() {
+		return restoreButton;
+	}
+
+	public JButton getDeleteButton() {
+		return deleteButton;
+	}
+
+	public JButton getBackButton() {
+		return backButton;
+	}
+
+	// 모양 관련
+
 	private static void styleButton(JButton b, boolean dark) {
 		b.setFocusPainted(false);
 		b.setContentAreaFilled(false);
@@ -371,7 +388,7 @@ public class AdminMenuForm extends JFrame {
 		return BorderFactory.createMatteBorder(1, col == 0 ? 1 : 0, 1, col == COL_DELETE ? 1 : 0, LINE);
 	}
 
-	/** 썸네일(없으면 null) */
+	/* 썸네일(없으면 null) */
 	private ImageIcon loadThumb(MenuDTO m) {
 		String path = m.getThumbnailPath();
 		if (path == null || path.isEmpty()) {
@@ -384,20 +401,15 @@ public class AdminMenuForm extends JFrame {
 			return thumbCache.get(path);
 		}
 		ImageIcon icon = null;
-		for (File f : new File[] { new File("." + path), new File(path) }) {
-			if (f.isFile()) {
-				ImageIcon raw = new ImageIcon(f.getPath());
-				if (raw.getIconWidth() > 0) {
-					icon = new ImageIcon(raw.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
-					break;
-				}
-			}
+		BufferedImage img = MenuImageUtil.read(path);
+		if (img != null) {
+			icon = new ImageIcon(img.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
 		}
 		thumbCache.put(path, icon);
 		return icon;
 	}
 
-	/** 이미지 / 메뉴명 칸 */
+	/* 이미지 / 메뉴명 칸 */
 	private class NameRenderer implements TableCellRenderer {
 		private final JPanel panel = new JPanel(new BorderLayout(12, 0));
 		private final JLabel thumb = new JLabel("이미지", SwingConstants.CENTER);
@@ -416,13 +428,13 @@ public class AdminMenuForm extends JFrame {
 			thumbWrap.add(thumb);
 			panel.add(thumbWrap, BorderLayout.WEST);
 			panel.add(name, BorderLayout.CENTER);
-			panel.setBorder(BorderFactory.createCompoundBorder(rowBorder(0),
-					BorderFactory.createEmptyBorder(0, 8, 0, 0)));
+			panel.setBorder(
+					BorderFactory.createCompoundBorder(rowBorder(0), BorderFactory.createEmptyBorder(0, 8, 0, 0)));
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-				boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
 			MenuDTO m = (MenuDTO) value;
 			ImageIcon icon = loadThumb(m);
 			thumb.setIcon(icon);
@@ -433,7 +445,7 @@ public class AdminMenuForm extends JFrame {
 		}
 	}
 
-	/** 카테고리 / 가격 / 상태 칸 */
+	/* 카테고리 / 가격 / 상태 칸 */
 	private static class TextRenderer extends DefaultTableCellRenderer {
 		private static final long serialVersionUID = 1L;
 		private final boolean statusColumn;
@@ -444,8 +456,8 @@ public class AdminMenuForm extends JFrame {
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-				boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
 			super.getTableCellRendererComponent(table, value, false, false, row, column);
 			setOpaque(true);
 			setBackground(isSelected ? SELECTED : Color.WHITE);
@@ -456,7 +468,7 @@ public class AdminMenuForm extends JFrame {
 		}
 	}
 
-	/** 수정 / 품절·해제 / 삭제 버튼 칸 */
+	/* 수정 / 품절·해제 / 삭제 버튼 칸 */
 	private class ButtonCellRenderer implements TableCellRenderer {
 		private final JPanel panel = new JPanel(new GridBagLayout());
 		private final int col;
@@ -475,8 +487,8 @@ public class AdminMenuForm extends JFrame {
 		}
 
 		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-				boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
 			if (col == COL_STATE) {
 				boolean soldOut = ((MenuDTO) value).getMenuStatus() == 1;
 				soldOutButton.setVisible(!soldOut); // 판매중이면 '품절', 품절이면 '해제'
