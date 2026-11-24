@@ -861,3 +861,4 @@ public class MenuForm extends JFrame {
         return checkoutButton;
     }
 }
+
