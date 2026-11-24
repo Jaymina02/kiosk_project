@@ -370,13 +370,9 @@ public class MenuEditDialog extends JDialog {
 
 	/* 이미지 미리보기 */
 	private void showExistingImage(String path) {
-		if (path == null || path.isEmpty()) {
-			return;
-		}
-		for (File f : new File[] { new File("." + path), new File(path) }) {
-			if (f.isFile() && showPreview(f)) {
-				return;
-			}
+		BufferedImage img = MenuImageUtil.read(path);
+		if (img != null) {
+			showPreview(img);
 		}
 	}
 
@@ -391,20 +387,23 @@ public class MenuEditDialog extends JDialog {
 
 	private boolean showPreview(File file) {
 		try {
-			BufferedImage img = ImageIO.read(file);
-			if (img == null) {
-				return false;
-			}
-			int boxW = 123, boxH = 103;
-			double scale = Math.min((double) boxW / img.getWidth(), (double) boxH / img.getHeight());
-			int w = Math.max(1, (int) (img.getWidth() * scale));
-			int h = Math.max(1, (int) (img.getHeight() * scale));
-			imagePreview.setIcon(new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH)));
-			imagePreview.setText(null);
-			return true;
+			return showPreview(ImageIO.read(file));
 		} catch (IOException e) {
 			return false;
 		}
+	}
+
+	private boolean showPreview(BufferedImage img) {
+		if (img == null) {
+			return false;
+		}
+		int boxW = 123, boxH = 103;
+		double scale = Math.min((double) boxW / img.getWidth(), (double) boxH / img.getHeight());
+		int w = Math.max(1, (int) (img.getWidth() * scale));
+		int h = Math.max(1, (int) (img.getHeight() * scale));
+		imagePreview.setIcon(new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH)));
+		imagePreview.setText(null);
+		return true;
 	}
 
 	/* 입력값으로 MenuDTO 생성 */

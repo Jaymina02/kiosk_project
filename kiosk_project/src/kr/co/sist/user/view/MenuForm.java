@@ -73,14 +73,14 @@ public class MenuForm extends JFrame {
     // 2. 팀원 기능 연결용 변수
     // ========================================
 
-    // 3번 담당자의 결제 화면 실행 기능
+    // 결제 화면 실행 기능
     private static Runnable paymentHandler;
 
-    // 2번 담당자 장바구니 상품 개수
+    // 장바구니 상품 개수
     private static IntSupplier cartCountSupplier =
             () -> 0;
 
-    // 2번 담당자 장바구니 총금액
+    // 장바구니 총금액
     private static IntSupplier cartTotalSupplier =
             () -> 0;
 
@@ -251,7 +251,7 @@ public class MenuForm extends JFrame {
     // ========================================
 
     /**
-     * 3번 담당자의 결제 선택 화면을
+     * 결제 선택 화면을
      * 실행할 핸들러를 등록한다.
      *
      * KioskMain.java에서 호출한다.
@@ -337,7 +337,7 @@ public class MenuForm extends JFrame {
     // ========================================
 
     /**
-     * 2번 담당자의 CartListService와
+     * CartListService와
      * 연결하기 위한 메서드
      */
     public static void setCartSummarySuppliers(

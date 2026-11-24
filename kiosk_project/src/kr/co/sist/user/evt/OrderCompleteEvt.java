@@ -24,7 +24,7 @@ public class OrderCompleteEvt implements ActionListener {
     public void returnToMain() {
         form.dispose();
         try {
-            // 1번 파트 담당자의 MainForm이 main에 병합되기 전에도 컴파일 오류가 나지 않도록 동적 호출
+            // MainForm을 동적으로 열기
             Class<?> mainFormClass = Class.forName("kr.co.sist.user.view.MainForm");
             mainFormClass.getDeclaredConstructor().newInstance();
         } catch (ClassNotFoundException e) {

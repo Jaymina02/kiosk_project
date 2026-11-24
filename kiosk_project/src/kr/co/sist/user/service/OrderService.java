@@ -68,7 +68,7 @@ public class OrderService {
             orderDAO.insertOrder(conn, order);
 
             for (CartDTO item : items) {
-                // 1번 파트(lsj) MenuDTO 연동 완료 시 아래처럼 getMenu() 우선 사용 가능:
+                // MenuDTO 연동 완료 시 아래처럼 getMenu() 우선 사용 가능:
                 // long menuId = (item.getMenu() != null && item.getMenu().getMenuId() > 0)
                 //         ? item.getMenu().getMenuId()
                 //         : orderDAO.selectMenuIdByName(conn, item.getMenuName());

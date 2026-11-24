@@ -13,7 +13,7 @@ import kr.co.sist.user.service.CartListService;
 /**
  * 카페 키오스크 프로그램 실행 클래스
  *
- * 1번 담당자 실행 진입점
+ * 실행 진입점
  *
  * 메인 화면 → 메뉴 조회 → 상품 상세
  * → 옵션 선택 → 장바구니 → 결제
@@ -27,7 +27,7 @@ public class KioskMain {
 
         SwingUtilities.invokeLater(() -> {
 
-            // 1번, 2번, 3번 담당자 기능 연결
+            // 기능 연결
             initializeTeamIntegration();
 
             // 메인 화면 생성 및 표시
@@ -36,12 +36,12 @@ public class KioskMain {
     }
 
     /**
-     * 팀원 기능 연동
+     * 화면 기능 연결
      */
     private static void initializeTeamIntegration() {
 
         // ====================================
-        // 1번 → 2번 : 옵션 선택 화면 연결
+        // 옵션 선택 화면 연결
         // ====================================
 
         /*
@@ -53,11 +53,11 @@ public class KioskMain {
         );
 
         // ====================================
-        // 2번 → 1번 : 장바구니 정보 연결
+        // 장바구니 정보 연결
         // ====================================
 
         /*
-         * 2번 담당자의 CartListService에서
+         * CartListService에서
          * 장바구니에 담긴 총 수량과 총금액을 가져온다.
          *
          * MenuForm 하단에 표시되는
@@ -69,12 +69,12 @@ public class KioskMain {
         );
 
         // ====================================
-        // 1번 → 3번 : 결제 화면 연결
+        // 결제 화면 연결
         // ====================================
 
         /*
          * 메뉴 화면 하단의 결제 버튼 클릭 시
-         * 3번 담당자의 결제수단 선택 화면을 실행한다.
+         * 결제수단 선택 화면을 실행한다.
          *
          * 장바구니가 비어 있는 경우에는
          * MenuForm에서 결제를 제한한다.
@@ -87,14 +87,7 @@ public class KioskMain {
         // 매장 / 포장 주문 유형 연결
         // ====================================
 
-        /*
-         * MainForm의 주문 유형 선택 기능은
-         * MainForm.setOrderTypeHandler(...)의
-         * 실제 매개변수 형식을 확인한 후 연결한다.
-         *
-         * CartListService.setOrderType(...) 메서드는
-         * 2번 담당자 코드에 구현되어 있다.
-         */
+        // 주문 유형은 MainEvt에서 CartListService에 저장한다.
     }
 }
 //

@@ -116,7 +116,7 @@ public class MainForm extends JFrame {
     }
 
     /**
-     * 2번 담당자 장바구니 연결용
+     * 장바구니 연결용
      */
     public static void setOrderTypeHandler(
             Consumer<String> handler) {

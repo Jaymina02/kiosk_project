@@ -36,7 +36,7 @@ public class MenuDetailDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
 
-    // 2번 담당자 옵션 선택 화면 연결
+    // 옵션 선택 화면 연결
     private static Consumer<MenuDTO> optionHandler;
 
     // 메뉴 상세 조회 서비스
@@ -461,7 +461,7 @@ public class MenuDetailDialog extends JDialog {
     }
 
     /**
-     * 2번 담당자 옵션 선택 화면 연결
+     * 옵션 선택 화면 연결
      */
     public static void setOptionHandler(
             Consumer<MenuDTO> handler) {
