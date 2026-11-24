@@ -9,10 +9,11 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -384,14 +385,9 @@ public class AdminMenuForm extends JFrame {
 			return thumbCache.get(path);
 		}
 		ImageIcon icon = null;
-		for (File f : new File[] { new File("." + path), new File(path) }) {
-			if (f.isFile()) {
-				ImageIcon raw = new ImageIcon(f.getPath());
-				if (raw.getIconWidth() > 0) {
-					icon = new ImageIcon(raw.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH));
-					break;
-				}
-			}
+		BufferedImage img = MenuImageUtil.read(path);
+		if (img != null) {
+			icon = new ImageIcon(img.getScaledInstance(50, 50, Image.SCALE_SMOOTH));
 		}
 		thumbCache.put(path, icon);
 		return icon;

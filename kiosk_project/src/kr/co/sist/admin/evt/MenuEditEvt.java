@@ -21,10 +21,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import kr.co.sist.admin.dto.MenuDTO;
 import kr.co.sist.admin.service.MenuService;
 import kr.co.sist.admin.view.MenuEditDialog;
+import kr.co.sist.admin.view.MenuImageUtil;
 
 public class MenuEditEvt implements ActionListener {
 	private static final String IMAGE_DIR = "images"; // 실행 폴더 아래 images 폴더에 저장
 	private static final int THUMB_WIDTH = 150;
+	private static final String THUMB_SUFFIX = "_thumb"; // 썸네일 이름: grape.jpg -> grape_thumb.jpg
 
 	private MenuEditDialog editDialog;
 	private MenuService menuService;
@@ -157,24 +159,22 @@ public class MenuEditEvt implements ActionListener {
 				editDialog.showMessage("이미지 파일을 읽을 수 없습니다.");
 				return false;
 			}
-			File dir = new File(IMAGE_DIR);
+			File dir = MenuImageUtil.getSaveFolder(); // 기본: 작업 폴더/images (imageDir 설정이 있으면 그 아래)
 			dir.mkdirs();
+			System.out.println("이미지 저장 폴더: " + dir.getAbsolutePath());
 
 			String name = picked.getName();
 			int dot = name.lastIndexOf('.');
 			String base = dot > 0 ? name.substring(0, dot) : name;
 			String ext = dot > 0 ? name.substring(dot) : "";
 
+			// 상세 이미지는 고른 파일 이름 그대로 저장한다 (같은 이름이 있으면 덮어쓴다)
 			File target = new File(dir, name);
-			if (target.exists() && !Files.isSameFile(target.toPath(), picked.toPath())) {
-				base = base + "_" + System.currentTimeMillis(); // 같은 이름의 다른 파일이 있으면 이름을 바꾼다
-				target = new File(dir, base + ext);
-			}
-			if (!target.exists()) {
+			if (!target.exists() || !Files.isSameFile(target.toPath(), picked.toPath())) {
 				Files.copy(picked.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			}
 
-			// 썸네일 (가로 150px): 상세 이미지가 menu1.png 이면 썸네일은 menu1_1.png 로 저장
+			// 썸네일 (가로 150px): 상세 이미지가 grape.jpg 이면 썸네일은 grape_thumb.jpg 로 저장
 			String lower = ext.toLowerCase();
 			boolean supported = lower.equals(".jpg") || lower.equals(".jpeg") || lower.equals(".png")
 					|| lower.equals(".gif") || lower.equals(".bmp");
@@ -193,7 +193,7 @@ public class MenuEditEvt implements ActionListener {
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			g.drawImage(src, 0, 0, w, h, null);
 			g.dispose();
-			String thumbName = base + "_1" + thumbExt;
+			String thumbName = base + THUMB_SUFFIX + thumbExt;
 			if (!ImageIO.write(thumb, format, new File(dir, thumbName))) {
 				throw new IOException("썸네일 저장에 실패했습니다. (" + format + ")");
 			}
