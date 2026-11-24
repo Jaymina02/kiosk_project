@@ -12,16 +12,11 @@ import javax.imageio.ImageIO;
 
 import kr.co.sist.common.db.DbConn;
 
-/**
- * DB에 저장된 이미지 경로(예: /images/grape.jpg)로 이미지를 찾아서 읽는다.
- * 아래 순서로 찾고, 못 찾으면 콘솔에 찾아본 위치를 출력한다.
- * 1) config/database.properties 의 imageDir (있을 때)  2) 작업 폴더(프로젝트 폴더)  3) 드라이브 루트  4) 클래스패스
- */
+/* DB에 저장된 이미지 경로로 이미지를 찾아서 읽는다. */
 public class MenuImageUtil {
 	private MenuImageUtil() {
 	}
 
-	/** config/database.properties 의 imageDir 값, 없으면 null. 예) imageDir=C:/dev/workspace/MyProject/WebContent */
 	public static String getImageDir() {
 		try {
 			Properties prop = DbConn.getInstance().getProp(null);
@@ -37,13 +32,13 @@ public class MenuImageUtil {
 		return null;
 	}
 
-	/** 새 이미지를 저장할 images 폴더 (imageDir 이 있으면 그 아래, 없으면 작업 폴더 아래) */
+	/* 새 이미지를 저장할 images 폴더 */
 	public static File getSaveFolder() {
 		String dir = getImageDir();
 		return dir == null ? new File("images") : new File(dir, "images");
 	}
 
-	/** 경로로 이미지를 읽어서 반환. 못 찾으면 null */
+	/* 경로로 이미지를 읽어서 반환. 못 찾으면 null */
 	public static BufferedImage read(String dbPath) {
 		if (dbPath == null || dbPath.trim().isEmpty()) {
 			return null;

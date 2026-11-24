@@ -45,7 +45,6 @@ import kr.co.sist.admin.dto.CategoryDTO;
 import kr.co.sist.admin.dto.MenuDTO;
 import kr.co.sist.admin.evt.AdminMenuEvt;
 
-/** 관리자 메뉴 관리 (리스트/조회) 화면 - adminMenuList (기획서 19p) */
 public class AdminMenuForm extends JFrame {
 	private static final long serialVersionUID = 1L;
 
@@ -96,7 +95,7 @@ public class AdminMenuForm extends JFrame {
 		addButton.setPreferredSize(new Dimension(100, 40));
 		for (JButton b : new JButton[] { editButton, soldOutButton, restoreButton, deleteButton }) {
 			styleButton(b, false);
-			b.setPreferredSize(new Dimension(BTN_W, BTN_H)); // 표 안에 그려질 버튼 (클릭은 표에서 처리)
+			b.setPreferredSize(new Dimension(BTN_W, BTN_H));
 		}
 		styleButton(backButton, true);
 		backButton.setPreferredSize(new Dimension(100, 40));
