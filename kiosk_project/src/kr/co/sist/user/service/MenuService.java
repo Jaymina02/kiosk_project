@@ -5,47 +5,106 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kr.co.sist.user.dao.MenuDAO;
+import kr.co.sist.user.dto.CategoryDTO;
+import kr.co.sist.user.dto.MenuDTO;
 import kr.co.sist.user.dto.MenuOptionDTO;
 
+/**
+ * 사용자 메뉴 서비스
+ *
+ * :
+ * - 카테고리 조회
+ * - 메뉴 목록 조회
+ * - 메뉴 상세 조회
+ *
+ * :
+ * - 전체 옵션 조회
+ * - 메뉴별 옵션 조회
+ */
 public class MenuService {
 
-	public List<String> searchMenuOptions(){
-		List<String> listMenuOption = new ArrayList<String>();
-		//분할된 컬럼의 값(DTO)을 CSV Data 변환하는 업무
-		MenuDAO mDAO=MenuDAO.getInstance();
-		
-		try {
-			List<MenuOptionDTO> tempList= mDAO.selectMenuOptions();
-			StringBuilder csvData=new StringBuilder();
-			
-			for(MenuOptionDTO mDTO: tempList ) {
-				csvData.delete(0, csvData.length());
-				//분할된 값을 CSV데이터로 생성
-				csvData
-				.append(mDTO.getOptionId()).append(",")
-				.append(mDTO.getOptionType()).append(",")
-				.append(mDTO.getTemperature()).append(",")
-				.append(mDTO.getSize()).append(",")
-				.append(mDTO.getOptionName()).append(",")
-				.append(mDTO.getMenuName()).append(",")
-				.append(mDTO.getOptionPrice()).append(",")
-				.append(mDTO.getBasePrice()).append(",")
-				.append(mDTO.getQuantity()).append(",")
-				.append(mDTO.getTotalAmount()).append(",")
-				.append(mDTO.getThumbnailPath()).append(",")
-				.append(mDTO.getExtraOptionNames()).append(",");
-				
-				//생성된 문자열(CSV)을 화면에 보여줄 리스트(dlmMember)에서
-				//사용할 리스트(listMenuOption)에 할당한다.
-				listMenuOption.add(csvData.toString());
-				
-			}//end for
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}//end catch
-		
-		return listMenuOption;
-	}//searchMenuOptions
-	
-}//class
+    private final MenuDAO menuDAO;
+
+    public MenuService() {
+        this.menuDAO = MenuDAO.getInstance();
+    }
+
+    // ========================================
+    // 카테고리 조회
+    // ========================================
+
+    public List<CategoryDTO> searchCategories() {
+        return menuDAO.selectCategories();
+    }
+
+    // ========================================
+    // 메뉴 목록 조회
+    // ========================================
+
+    public List<MenuDTO> searchMenus(long categoryId) {
+        return menuDAO.selectMenus(categoryId);
+    }
+
+    // ========================================
+    // 메뉴 상세 조회
+    // ========================================
+
+    public MenuDTO searchMenuDetail(long menuId) {
+        return menuDAO.selectMenuById(menuId);
+    }
+
+    // ========================================
+    // 전체 옵션 조회
+    // ========================================
+
+    /**
+     * 기존 반환 형식 유지:
+     * MenuOptionDTO 목록을 CSV 문자열 목록으로 변환
+     */
+    public List<String> searchMenuOptions() {
+
+        List<String> result = new ArrayList<>();
+
+        try {
+
+            List<MenuOptionDTO> options =
+                menuDAO.selectMenuOptions();
+
+            for (MenuOptionDTO dto : options) {
+
+                StringBuilder csv = new StringBuilder();
+
+                csv.append(dto.getOptionId()).append(",");
+                csv.append(dto.getOptionType()).append(",");
+                csv.append(dto.getTemperature()).append(",");
+                csv.append(dto.getSize()).append(",");
+                csv.append(dto.getOptionName()).append(",");
+                csv.append(dto.getMenuName()).append(",");
+                csv.append(dto.getOptionPrice()).append(",");
+                csv.append(dto.getBasePrice()).append(",");
+                csv.append(dto.getQuantity()).append(",");
+                csv.append(dto.getTotalAmount()).append(",");
+                csv.append(dto.getThumbnailPath()).append(",");
+                csv.append(dto.getExtraOptionNames()).append(",");
+
+                result.add(csv.toString());
+            }
+
+        } catch (SQLException e) {
+            throw new IllegalStateException(
+                "메뉴 옵션 조회 실패", e
+            );
+        }
+
+        return result;
+    }
+
+    // ========================================
+    // 1번·2번 연동 - 메뉴별 옵션 조회
+    // ========================================
+
+    public List<MenuOptionDTO> searchMenuOptions(long menuId) {
+        return menuDAO.selectMenuOptions(menuId);
+    }
+}
+//

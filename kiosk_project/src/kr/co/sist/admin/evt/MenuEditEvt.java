@@ -157,7 +157,7 @@ public class MenuEditEvt implements ActionListener {
 				editDialog.showMessage("이미지 파일을 읽을 수 없습니다.");
 				return false;
 			}
-			File dir = new File(IMAGE_DIR);
+			File dir = kr.co.sist.admin.view.MenuImageUtil.getSaveFolder();
 			dir.mkdirs();
 
 			String name = picked.getName();

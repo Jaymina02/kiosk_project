@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import kr.co.sist.admin.view.MenuImageUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -387,17 +389,10 @@ public class AdminMenuEvt implements ActionListener {
 
 	/** 이미지 파일이 있으면 크기를 맞춰 반환, 없으면 null */
 	private ImageIcon loadImage(String path, int w, int h) {
-		if (path == null || path.isEmpty()) {
+		BufferedImage img = MenuImageUtil.read(path);
+		if (img == null) {
 			return null;
 		}
-		for (File f : new File[] { new File("." + path), new File(path) }) {
-			if (f.isFile()) {
-				ImageIcon raw = new ImageIcon(f.getPath());
-				if (raw.getIconWidth() > 0) {
-					return new ImageIcon(raw.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH));
-				}
-			}
-		}
-		return null;
+		return new ImageIcon(img.getScaledInstance(w, h, Image.SCALE_SMOOTH));
 	}
 }

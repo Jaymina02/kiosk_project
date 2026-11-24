@@ -15,7 +15,6 @@ import kr.co.sist.admin.dto.SalesSummaryDTO;
 import kr.co.sist.admin.service.SalesService;
 import kr.co.sist.admin.view.SalesForm;
 
-
 public class SalesEvt extends MouseAdapter implements ActionListener {
 
 	private SalesForm salesForm;
