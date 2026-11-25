@@ -1,5 +1,6 @@
 package kr.co.sist.user.view;
 
+import java.awt.Window;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -43,6 +44,14 @@ public class OrderCompleteForm extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        
+        for (Window window : Window.getWindows()) {
+            if (window instanceof MenuForm) {
+                window.dispose();
+            }
+        }
+        
         setVisible(true);
     }
 
