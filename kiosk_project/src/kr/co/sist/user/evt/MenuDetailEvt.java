@@ -13,9 +13,7 @@ public class MenuDetailEvt {
 
     private final MenuDetailDialog dialog;
 
-    public MenuDetailEvt(
-            MenuDetailDialog dialog) {
-
+    public MenuDetailEvt(MenuDetailDialog dialog) {
         this.dialog = dialog;
     }
 
@@ -23,7 +21,6 @@ public class MenuDetailEvt {
      * 옵션 선택 버튼 클릭
      */
     public void selectOption() {
-
         dialog.selectOption();
     }
 
@@ -31,7 +28,6 @@ public class MenuDetailEvt {
      * 닫기 버튼 클릭
      */
     public void closeDetail() {
-
         dialog.closeDetail();
     }
 }

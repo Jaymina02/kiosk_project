@@ -1,4 +1,3 @@
-
 package kr.co.sist.user.service;
 
 import java.sql.SQLException;
@@ -13,12 +12,12 @@ import kr.co.sist.user.dto.MenuOptionDTO;
 /**
  * 사용자 메뉴 서비스
  *
- * 1번 담당:
+ * :
  * - 카테고리 조회
  * - 메뉴 목록 조회
  * - 메뉴 상세 조회
  *
- * 2번 담당:
+ * :
  * - 전체 옵션 조회
  * - 메뉴별 옵션 조회
  */
@@ -31,7 +30,7 @@ public class MenuService {
     }
 
     // ========================================
-    // 1번 담당 - 카테고리 조회
+    // 카테고리 조회
     // ========================================
 
     public List<CategoryDTO> searchCategories() {
@@ -39,7 +38,7 @@ public class MenuService {
     }
 
     // ========================================
-    // 1번 담당 - 메뉴 목록 조회
+    // 메뉴 목록 조회
     // ========================================
 
     public List<MenuDTO> searchMenus(long categoryId) {
@@ -47,7 +46,7 @@ public class MenuService {
     }
 
     // ========================================
-    // 1번 담당 - 메뉴 상세 조회
+    // 메뉴 상세 조회
     // ========================================
 
     public MenuDTO searchMenuDetail(long menuId) {
@@ -55,11 +54,11 @@ public class MenuService {
     }
 
     // ========================================
-    // 2번 담당 - 전체 옵션 조회
+    // 전체 옵션 조회
     // ========================================
 
     /**
-     * 2번 담당자 기존 반환 형식 유지:
+     * 기존 반환 형식 유지:
      * MenuOptionDTO 목록을 CSV 문자열 목록으로 변환
      */
     public List<String> searchMenuOptions() {

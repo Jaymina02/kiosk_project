@@ -94,7 +94,7 @@ public class OrderDAO {
     }
 
     /**
-     * 2번 파트 OptionEvt에서 optionId가 미설정(0)된 경우 옵션명으로 MENU_OPTION 테이블의 OPTION_ID를 조회한다.
+     * OptionEvt에서 optionId가 미설정(0)된 경우 옵션명으로 MENU_OPTION 테이블의 OPTION_ID를 조회한다.
      */
     public long selectOptionIdByName(Connection conn, String optionName) throws SQLException {
         if (optionName == null || optionName.isBlank()) {

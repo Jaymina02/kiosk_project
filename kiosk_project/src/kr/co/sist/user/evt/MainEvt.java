@@ -10,8 +10,7 @@ import kr.co.sist.user.service.CartListService;
 /**
  * 메인 화면 이벤트
  *
- * 1번 담당
- * - 매장 버튼 처리
+ * * - 매장 버튼 처리
  * - 포장 버튼 처리
  * - 주문 유형 저장
  * - 메뉴 화면 이동

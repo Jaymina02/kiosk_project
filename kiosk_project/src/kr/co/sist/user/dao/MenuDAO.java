@@ -1,4 +1,3 @@
-
 package kr.co.sist.user.dao;
 
 import java.sql.Connection;
@@ -18,12 +17,12 @@ import kr.co.sist.user.dto.MenuOptionDTO;
 /**
  * 사용자 메뉴 DAO
  *
- * 1번 담당:
+ * :
  * - 카테고리 전체 조회
  * - 카테고리별 메뉴 조회
  * - 상품 상세 조회
  *
- * 2번 담당:
+ * :
  * - 전체 메뉴 옵션 조회
  * - 메뉴별 옵션 조회
  */
@@ -78,7 +77,7 @@ public final class MenuDAO {
     }
 
     // ========================================
-    // 1번 담당 - 카테고리 전체 조회
+    // 카테고리 전체 조회
     // ========================================
 
     public List<CategoryDTO> selectCategories() {
@@ -116,7 +115,7 @@ public final class MenuDAO {
     }
 
     // ========================================
-    // 1번 담당 - 카테고리별 메뉴 조회
+    // 카테고리별 메뉴 조회
     // ========================================
 
     /**
@@ -166,7 +165,7 @@ public final class MenuDAO {
     }
 
     // ========================================
-    // 1번 담당 - 메뉴 상세 조회
+    // 메뉴 상세 조회
     // ========================================
 
     public MenuDTO selectMenuById(long menuId) {
@@ -200,7 +199,7 @@ public final class MenuDAO {
     }
 
     // ========================================
-    // 1번 담당 - MenuDTO 변환
+    // MenuDTO 변환
     // ========================================
 
     private MenuDTO mapMenu(ResultSet rs)
@@ -246,7 +245,7 @@ public final class MenuDAO {
     }
 
     // ========================================
-    // 2번 담당 - 전체 옵션 조회
+    // 전체 옵션 조회
     // ========================================
 
     /**
@@ -323,7 +322,7 @@ public final class MenuDAO {
     }
 
     // ========================================
-    // 2번 담당 - MenuOptionDTO 변환
+    // MenuOptionDTO 변환
     // ========================================
 
     private MenuOptionDTO mapMenuOption(ResultSet rs)

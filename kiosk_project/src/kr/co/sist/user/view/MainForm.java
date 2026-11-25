@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import kr.co.sist.user.evt.MainEvt;
+import kr.co.sist.user.service.CartListService;
 
 /**
  * 사용자 메인 화면
@@ -115,7 +116,7 @@ public class MainForm extends JFrame {
     }
 
     /**
-     * 2번 담당자 장바구니 연결용
+     * 장바구니 연결용
      */
     public static void setOrderTypeHandler(
             Consumer<String> handler) {
@@ -129,6 +130,8 @@ public class MainForm extends JFrame {
     public void openMenuForm(String orderType) {
 
         currentOrderType = orderType;
+        
+        CartListService.setOrderType(orderType);
 
         if (orderTypeHandler != null) {
             orderTypeHandler.accept(orderType);
